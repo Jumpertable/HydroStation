@@ -1,9 +1,6 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail,  IsNotEmpty } from 'class-validator';
 
 export class ManagerRegisterDto {
-  static password() {
-      throw new Error('Method not implemented.');
-  }
   @IsNotEmpty({ message: 'first name required!!' })
   first_name: string;
 
@@ -13,6 +10,7 @@ export class ManagerRegisterDto {
   @IsNotEmpty({ message: 'business email required!!' })
   @IsEmail({}, { message: 'The email format is incorrect.' })
   businessEmail: string;
+
 
   @IsNotEmpty({ message: 'password required!!' })
   password: string;

@@ -24,7 +24,7 @@ export class Manager extends Model {
   businessEmail: string;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(555),
   })
   companyAddress: string;
 

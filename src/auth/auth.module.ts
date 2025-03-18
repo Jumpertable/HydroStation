@@ -6,7 +6,7 @@ import { Manager } from 'src/manager/entities/manager.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
-  imports:[SequelizeModule.forFeature([Employee, Manager])],
+  imports: [SequelizeModule.forFeature([Employee, Manager])],
   providers: [AuthService],
   controllers: [AuthController],
 })
