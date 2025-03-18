@@ -11,8 +11,6 @@ import { Dialect } from 'sequelize';
 import { Employee } from './employee/entities/employee.entity';
 import { Manager } from './manager/entities/manager.entity';
 import { AuthModule } from './auth/auth.module';
-import { AuthsModule } from './auths/auths.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,7 +31,6 @@ import { AuthModule } from './auth/auth.module';
     UtilityModule,
     GlobalHelperModule,
     AuthModule,
-    AuthsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

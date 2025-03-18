@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({
@@ -26,7 +25,7 @@ export class Manager extends Model {
 
   @Column({
     type: DataType.STRING(50),
-    })
+  })
   companyAddress: string;
 
   @Column({

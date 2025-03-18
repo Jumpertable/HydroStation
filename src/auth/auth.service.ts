@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Employee } from 'src/employee/entities/employee.entity';
+import { Manager } from 'src/manager/entities/manager.entity';
+import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
+import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
+import { hash, genSalt } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectModel(Employee)
+    private readonly employeeModel: typeof Employee,
+
+    @InjectModel(Manager)
+    private readonly managerModel: typeof Manager,
+  ) {}
+
+  async registerEmployee(employeeRegisterDto: EmployeeRegisterDto) {
+    const employee = await this.employeeModel.findOne({
+      where: { businessEmail: employeeRegisterDto.businessEmail },
+    });
+    if (employee) {
+      throw new BadRequestException(
+        'This email already exists. Please try again.',
+      );
+    }
+    const salt = await genSalt(10);
+    const hashPassword = await hash(employeeRegisterDto.password, salt);
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async registerManager(managerRegisterDto: ManagerRegisterDto) {
+    const manager = await this.managerModel.findOne({
+      where: { businessEmail: managerRegisterDto.businessEmail },
+    });
+    if (manager) {
+      throw new BadRequestException(
+        'This email already exists. Please try again.',
+      );
+    }
+    const salt = await genSalt(10);
+    const hashPassword = await hash(managerRegisterDto.password, salt);
   }
 }

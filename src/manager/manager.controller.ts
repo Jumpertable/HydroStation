@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ManagerService } from './manager.service';
-import { CreateManagerDto } from './dto/create-manager.dto';
-import { UpdateManagerDto } from './dto/update-manager.dto';
+import { ManagerLoginDto } from './dto/login.dto';
+import { ManagerRegisterDto } from './dto/register.dto';
 
 @Controller('manager')
 export class ManagerController {
   constructor(private readonly managerService: ManagerService) {}
 
   @Post()
-  create(@Body() createManagerDto: CreateManagerDto) {
-    return this.managerService.create(createManagerDto);
+  create(@Body() managerLoginDto: ManagerLoginDto) {
+    return this.managerService.create(managerLoginDto);
   }
 
   @Get()
@@ -23,8 +31,11 @@ export class ManagerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateManagerDto: UpdateManagerDto) {
-    return this.managerService.update(+id, updateManagerDto);
+  update(
+    @Param('id') id: string,
+    @Body() managerRegisterDto: ManagerRegisterDto,
+  ) {
+    return this.managerService.update(+id, managerRegisterDto);
   }
 
   @Delete(':id')

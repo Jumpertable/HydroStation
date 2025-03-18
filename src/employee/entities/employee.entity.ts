@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { Manager } from 'src/manager/entities/manager.entity';
 
 @Table({
   tableName: 'employee',
@@ -20,6 +28,7 @@ export class Employee extends Model {
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
+    unique: true,
   })
   businessEmail: string;
 
@@ -28,11 +37,15 @@ export class Employee extends Model {
   })
   companyAddress: string;
 
+
+  @ForeignKey(() => Manager)
   @Column({
-    type: DataType.STRING(50),
-    allowNull: false,
+    type: DataType.INTEGER,
   })
-  manager_name: string;
+  manager_id: number;
+
+  @BelongsTo(() => Manager)
+  manager: Manager;
 
   @Column({
     type: DataType.STRING(50),
@@ -41,7 +54,7 @@ export class Employee extends Model {
   password: string;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING,
     allowNull: false,
   })
   manager_code: string;
