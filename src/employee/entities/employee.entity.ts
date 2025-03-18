@@ -1,28 +1,48 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({
   tableName: 'employee',
   timestamps: false,
 })
 export class Employee extends Model {
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
   first_name: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(200),
+    allowNull: false,
+  })
   last_name: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
   businessEmail: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+  })
   companyAddress: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
   manager_name: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
   password: string;
 
-  @Column({})
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
   manager_code: string;
 }

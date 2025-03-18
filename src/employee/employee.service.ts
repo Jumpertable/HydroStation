@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Employee } from './entities/employee.entity';
+import { InjectModel } from '@nestjs/sequelize'
 
 @Injectable()
 export class EmployeeService {
+  constructor(
+    @InjectModel(Employee)
+    private employeeModel: typeof Employee,
+  ) {}
+
   create(createEmployeeDto: CreateEmployeeDto) {
     return 'This action adds a new employee';
   }
 
-  findAll() {
-    return `This action returns all employee`;
+  async findAll() {
+    return await this.employeeModel.findAll();
   }
 
   findOne(id: number) {
