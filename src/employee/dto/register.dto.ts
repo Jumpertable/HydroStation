@@ -11,9 +11,6 @@ export class EmployeeRegisterDto {
   @IsEmail({}, { message: 'The email format is incorrect.' })
   businessEmail: string;
 
- 
-
-
   @IsNotEmpty({ message: 'password required!!' })
   password: string;
 }

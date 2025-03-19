@@ -37,7 +37,6 @@ export class Employee extends Model {
   })
   companyAddress: string;
 
-
   @ForeignKey(() => Manager)
   @Column({
     type: DataType.INTEGER,

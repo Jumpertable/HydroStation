@@ -4,6 +4,8 @@ import { Employee } from 'src/employee/entities/employee.entity';
 import { Manager } from 'src/manager/entities/manager.entity';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
+//import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
+//import { ManagerLoginDto } from 'src/manager/dto/login.dto';
 import { hash, genSalt } from 'bcrypt';
 
 @Injectable()
@@ -57,9 +59,7 @@ export class AuthService {
     const hashPassword = await hash(managerRegisterDto.password, salt);
 
     const newMan = await this.managerModel.create({
-      first_name: managerRegisterDto.first_name,
-      last_name: managerRegisterDto.last_name,
-      businessEmail: managerRegisterDto.businessEmail,
+      ...managerRegisterDto,
       password: hashPassword,
     });
 

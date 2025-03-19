@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { ManagerLoginDto } from './dto/login.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ManagerRegisterDto } from './dto/register.dto';
+import { Manager } from './entities/manager.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { genSalt, hash } from 'bcrypt';
 
 @Injectable()
 export class ManagerService {
-  create(managerLoginDto: ManagerLoginDto) {
-    return 'This action adds a new manager';
+  constructor(
+    @InjectModel(Manager)
+    private managerModel: typeof Manager,
+  ) {}
+
+  async create(managerRegisterDto: ManagerRegisterDto) {
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(managerRegisterDto.password, salt);
+    const newMan = await this.managerModel.create({
+      ...managerRegisterDto,
+      password: hashedPassword,
+    });
+    return newMan;
   }
 
-  findAll() {
-    return `This action returns all manager`;
+  async findAll() {
+    return await this.managerModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} manager`;
+  async findOne(id: number) {
+    const manager = await this.managerModel.findByPk(id);
+    if (!manager) {
+      throw new NotFoundException(`Manager with id ${id} not found`);
+    }
+    return manager;
   }
 
-  update(id: number, managerRegisterDto: ManagerRegisterDto) {
-    return `This action updates a #${id} manager`;
+  async update(id: number, managerRegisterDto: ManagerRegisterDto) {
+    const manager = await this.findOne(id);
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(managerRegisterDto.password, salt);
+    await manager.update({
+      ...managerRegisterDto,
+      password: hashedPassword,
+    });
+    return manager;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} manager`;
+  async remove(id: number) {
+    const manager = await this.findOne(id);
+    await manager.destroy();
+    return { message: `Manager with id ${id} has been removed` };
   }
 }

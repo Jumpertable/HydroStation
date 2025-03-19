@@ -8,7 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ManagerService } from './manager.service';
-import { ManagerLoginDto } from './dto/login.dto';
 import { ManagerRegisterDto } from './dto/register.dto';
 
 @Controller('manager')
@@ -16,13 +15,13 @@ export class ManagerController {
   constructor(private readonly managerService: ManagerService) {}
 
   @Post()
-  create(@Body() managerLoginDto: ManagerLoginDto) {
-    return this.managerService.create(managerLoginDto);
+  create(@Body() managerRegisterDto: ManagerRegisterDto) {
+    return this.managerService.create(managerRegisterDto);
   }
 
   @Get()
-  findAll() {
-    return this.managerService.findAll();
+  async findAll() {
+    return await this.managerService.findAll();
   }
 
   @Get(':id')
@@ -31,11 +30,11 @@ export class ManagerController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() managerRegisterDto: ManagerRegisterDto,
   ) {
-    return this.managerService.update(+id, managerRegisterDto);
+    return await this.managerService.update(+id, managerRegisterDto);
   }
 
   @Delete(':id')

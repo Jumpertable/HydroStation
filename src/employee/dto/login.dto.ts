@@ -8,8 +8,6 @@ export class EmployeeLoginDto {
   @IsNotEmpty({ message: 'password required!!' })
   password: string;
 
-
-
   @IsNotEmpty({ message: 'manager code required!!' })
   manager_code: string;
 }

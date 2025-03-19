@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { EmployeeLoginDto } from './dto/login.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EmployeeRegisterDto } from './dto/register.dto';
 import { Employee } from './entities/employee.entity';
 import { InjectModel } from '@nestjs/sequelize';
+import { genSalt, hash } from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
@@ -11,23 +11,42 @@ export class EmployeeService {
     private employeeModel: typeof Employee,
   ) {}
 
-  create(employeeLoginDto: EmployeeLoginDto) {
-    return 'This action adds a new employee';
+  async create(employeeRegisterDto: EmployeeRegisterDto) {
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(employeeRegisterDto.password, salt);
+    const newEmployee = await this.employeeModel.create({
+      ...employeeRegisterDto,
+      password: hashedPassword,
+    });
+    return newEmployee;
   }
 
   async findAll() {
     return await this.employeeModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} employee`;
+  async findOne(id: number) {
+    const employee = await this.employeeModel.findByPk(id);
+    if (!employee) {
+      throw new NotFoundException(`Employee with id ${id} not found`);
+    }
+    return employee;
   }
 
-  update(id: number, employeeRegisterDto: EmployeeRegisterDto) {
-    return `This action updates a #${id} employee`;
+  async update(id: number, employeeRegisterDto: EmployeeRegisterDto) {
+    const employee = await this.findOne(id);
+    const salt = await genSalt(10);
+    const hashedPassword = await hash(employeeRegisterDto.password, salt);
+    await employee.update({
+      ...employeeRegisterDto,
+      password: hashedPassword,
+    });
+    return employee;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} employee`;
+  async remove(id: number) {
+    const employee = await this.findOne(id);
+    await employee.destroy();
+    return { message: `Employee with id ${id} has been removed` };
   }
 }
