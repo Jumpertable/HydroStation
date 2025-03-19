@@ -1,9 +1,18 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
 // import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
-// import { ManagerLoginDto } from 'src/manager/dto/login.dto';
+import { ManagerLoginDto } from 'src/manager/dto/login.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -17,6 +26,14 @@ export class AuthController {
     };
   }
 
+  //Manager
+
+  //"first_name": "r",
+  //"last_name": "r",
+  //"businessEmail": "r",
+  //"companyAddress": "non",
+  //"password": "r"
+
   @Post('/manager/regist') //localhost:3100/auth/manager/regist
   @HttpCode(201)
   async registerManager(@Body() managerRegisterDto: ManagerRegisterDto) {
@@ -24,5 +41,21 @@ export class AuthController {
     return {
       message: 'Manager Registration Complete!',
     };
+  }
+
+  //"businessEmail": "r",
+  //"password": "r"
+
+  @Post('/manager/login') //localhost:3100/auth/manager/login
+  @HttpCode(201)
+  async login(@Body() managerLoginDto: ManagerLoginDto) {
+    return this.authService.login(managerLoginDto);
+  }
+
+  //Only manager
+  @UseGuards(JwtAuthGuard)
+  @Get('/manager/profile') //localhost:3000/auth/profile
+  async getUserProfile(@Request() req) {
+    return await this.authService.getManagerProfile(Number(req.user.user_id));
   }
 }

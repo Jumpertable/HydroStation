@@ -12,11 +12,10 @@ export class ManagerRegisterDto {
   @IsEmail({}, { message: 'The email format is incorrect.' })
   businessEmail: string;
 
-   @IsString()
-    @MaxLength(255) // Adjust as needed
-    companyAddress: string;
+  @IsString()
+  @MaxLength(255) // Adjust as needed
+  companyAddress: string;
 
   @IsNotEmpty({ message: 'password required!!' })
-  
   password: string;
 }

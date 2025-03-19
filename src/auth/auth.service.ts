@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Manager } from 'src/manager/entities/manager.entity';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
 //import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
-//import { ManagerLoginDto } from 'src/manager/dto/login.dto';
-import { hash, genSalt } from 'bcrypt';
+import { ManagerLoginDto } from 'src/manager/dto/login.dto';
+import { hash, genSalt, compare } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +21,8 @@ export class AuthService {
 
     @InjectModel(Manager)
     private readonly managerModel: typeof Manager,
+
+    private readonly jwtService: JwtService,
   ) {}
 
   //Employee
@@ -44,6 +51,8 @@ export class AuthService {
     return newEmp;
   }
 
+  //Manager Registration
+
   async registerManager(managerRegisterDto: ManagerRegisterDto) {
     const manager = await this.managerModel.findOne({
       where: { businessEmail: managerRegisterDto.businessEmail },
@@ -59,10 +68,44 @@ export class AuthService {
     const hashPassword = await hash(managerRegisterDto.password, salt);
 
     const newMan = await this.managerModel.create({
-      ...managerRegisterDto,
+      first_name: managerRegisterDto.first_name,
+      last_name: managerRegisterDto.last_name,
+      businessEmail: managerRegisterDto.businessEmail,
+      companyAddress: managerRegisterDto.companyAddress,
       password: hashPassword,
     });
 
     return newMan;
+  }
+
+  //Manager Login
+
+  async login(managerLoginDto: ManagerLoginDto) {
+    const manager = await this.managerModel.findOne({
+      where: { businessEmail: managerLoginDto.businessEmail },
+    });
+    if (!manager) {
+      throw new UnauthorizedException('WHERE IS THE MANAGER!!!');
+    }
+
+    console.log('Manager Password:', manager.password);
+
+    const isValid = await compare(managerLoginDto.password, manager.password);
+    if (!isValid) {
+      throw new UnauthorizedException('INCORRCT PASSWORD!!!');
+    }
+
+    const payload = { user_id: manager.id };
+    const token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+    });
+
+    return { access_token: token };
+  }
+  
+  async getManagerProfile(id: number) {
+    return await this.managerModel.findByPk(id, {
+      attributes: ['id', 'first_name', 'last_name', 'businessEmail'],
+    });
   }
 }
