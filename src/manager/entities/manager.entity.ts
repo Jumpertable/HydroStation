@@ -12,24 +12,24 @@ export class Manager extends Model {
   first_name: string;
 
   @Column({
-    type: DataType.STRING(200),
+    type: DataType.STRING(50),
     allowNull: false,
   })
   last_name: string;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(255),
     allowNull: false,
   })
   businessEmail: string;
 
   @Column({
-    type: DataType.STRING(555),
+    type: DataType.STRING(255),
   })
   companyAddress: string;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(255),
     allowNull: false,
   })
   password: string;

@@ -14,7 +14,7 @@ import { ManagerRegisterDto } from './dto/register.dto';
 export class ManagerController {
   constructor(private readonly managerService: ManagerService) {}
 
-  @Post()
+  @Post('/regist')
   create(@Body() managerRegisterDto: ManagerRegisterDto) {
     return this.managerService.create(managerRegisterDto);
   }

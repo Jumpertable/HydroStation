@@ -12,7 +12,7 @@ export class ManagerService {
   ) {}
 
   async create(managerRegisterDto: ManagerRegisterDto) {
-    const salt = await genSalt(10);
+    const salt = await genSalt(20);
     const hashedPassword = await hash(managerRegisterDto.password, salt);
     const newMan = await this.managerModel.create({
       ...managerRegisterDto,

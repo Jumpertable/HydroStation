@@ -47,7 +47,7 @@ export class Employee extends Model {
   manager: Manager;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(10),
     allowNull: false,
   })
   password: string;
