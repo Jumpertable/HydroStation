@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeRegisterDto } from './dto/register.dto';
@@ -37,8 +38,13 @@ export class EmployeeController {
     return this.employeeService.update(+id, employeeResgisterDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.employeeService.remove(+id);
+  @Delete('/delete/:id') //localhost:3100/manager/delete/:id
+  async remove(@Param('id') id: string) {
+    const destroyEmployee = await this.employeeService.remove(+id);
+    console.log(destroyEmployee);
+    if (destroyEmployee == 0) {
+      throw new NotFoundException('Employee on the loose!!');
+    }
+    return { message: `Employee with id ${id} has been removed` };
   }
 }

@@ -45,8 +45,8 @@ export class ManagerService {
   }
 
   async remove(id: number) {
-    const manager = await this.findOne(id);
-    await manager.destroy();
-    return { message: `Manager with id ${id} has been removed` };
+    return await this.managerModel.destroy({
+      where: { id: id },
+    });
   }
 }

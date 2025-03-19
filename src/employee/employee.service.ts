@@ -45,8 +45,8 @@ export class EmployeeService {
   }
 
   async remove(id: number) {
-    const employee = await this.findOne(id);
-    await employee.destroy();
-    return { message: `Employee with id ${id} has been removed` };
+    return await this.employeeModel.destroy({
+      where: { id: id },
+    });
   }
 }
