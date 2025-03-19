@@ -102,7 +102,6 @@ export class AuthService {
 
     return { access_token: token };
   }
-  
   async getManagerProfile(id: number) {
     return await this.managerModel.findByPk(id, {
       attributes: ['id', 'first_name', 'last_name', 'businessEmail'],
