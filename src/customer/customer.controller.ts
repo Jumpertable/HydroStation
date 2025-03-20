@@ -33,7 +33,7 @@ export class CustomerController {
   }
 
   //Update customer data
-  @Put(':id') //localhost:3100/customer/delete/:id
+  @Put('/update/:id') //localhost:3100/customer/update/:id
   async update(
     @Param('id') id: number,
     @Body() updateData: Partial<Customer>,
