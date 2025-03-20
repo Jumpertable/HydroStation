@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,7 +16,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+
   async validate(payload: any) {
-    return { user_id: payload.user_id };
+    console.log('🔓 Extracted Payload:', payload);  // ✅ Should contain { user_id: 1 }
+  
+    if (!payload.user_id) {
+      throw new UnauthorizedException('Invalid token: user_id missing');
+    }
+  
+    return { user_id: payload.user_id }; // ✅ This will be attached to `req.user`
   }
 }
