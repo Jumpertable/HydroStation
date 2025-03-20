@@ -6,6 +6,7 @@ import {
   Post,
   UseGuards,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
@@ -54,8 +55,12 @@ export class AuthController {
 
   //Only manager
   @UseGuards(JwtAuthGuard)
-  @Get('/manager/profile') //localhost:3000/auth/profile
+  @Get('/manager/profile') //localhost:3100/auth/manager/profile
   async getUserProfile(@Request() req) {
+    console.log('🛂 Extracting ID from request:', req.user.user_id);
+    if (!req.user.user_id) {
+      throw new BadRequestException('User ID is missing');
+    }
     return await this.authService.getManagerProfile(Number(req.user.user_id));
   }
 }

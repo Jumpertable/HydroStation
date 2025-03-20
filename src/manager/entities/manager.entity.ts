@@ -1,21 +1,36 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  AutoIncrement,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 
 @Table({
   tableName: 'manager',
   timestamps: false,
 })
 export class Manager extends Model {
+  @PrimaryKey // ✅ Mark as primary key
+  @AutoIncrement // ✅ Auto-incrementing ID
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.INTEGER, // ✅ Use INTEGER type for ID
     allowNull: false,
   })
-  first_name: string;
+  declare id: number;
 
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
   })
-  last_name: string;
+  first_name!: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
+  last_name!: string;
 
   @Column({
     type: DataType.STRING(255),

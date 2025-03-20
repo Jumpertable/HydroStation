@@ -85,27 +85,13 @@ export class AuthService {
 
     const manager = await this.managerModel.findOne({
       where: { businessEmail: managerLoginDto.businessEmail },
-      attributes: ['businessEmail', 'password'],
+      attributes: ['id', 'businessEmail', 'password'],
       raw: true,
     });
 
-    console.log(
-      '🔍 Running Query:',
-      `SELECT * FROM managers WHERE businessEmail = '${managerLoginDto.businessEmail}'`,
-    );
-
-    if (!manager) {
-      console.error('❌ Manager not found in the database');
+    if (!manager || !manager.id) {
+      console.error('❌ Manager not found or ID missing');
       throw new UnauthorizedException('WHERE IS THE MANAGER!?!');
-    }
-
-    console.log('✅ Manager Found:', manager);
-    console.log('🔑 Stored Hash (from DB):', manager.password);
-    console.log('🔑 Entered Password:', managerLoginDto.password);
-
-    if (!manager.password) {
-      console.error('❌ Manager password is missing from DB!');
-      throw new UnauthorizedException('Manager password is missing.');
     }
 
     const isValid = await compare(managerLoginDto.password, manager.password);
@@ -115,9 +101,11 @@ export class AuthService {
     }
 
     const payload = { user_id: manager.id };
+    console.log('📝 Signing JWT with payload:', payload);
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET_KEY || 'default_secret_key',
     });
+    console.log('🔑 Generated Token:', token);
 
     return { access_token: token };
   }
@@ -128,5 +116,4 @@ export class AuthService {
     });
   }
 }
-
-//Why does this have to be so painful
+//why does this have to be difficult???
