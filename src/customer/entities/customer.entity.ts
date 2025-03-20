@@ -8,45 +8,39 @@ import {
 } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'manager',
+  tableName: 'customer',
   timestamps: false,
 })
-export class Manager extends Model {
+export class Customer extends Model {
   @PrimaryKey // Mark as primary key
   @AutoIncrement //incrementing ID
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  declare id: number;
+  cusID: number;
 
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
   })
-  first_name!: string;
-
-  @Column({
-    type: DataType.STRING(50),
-    allowNull: false,
-  })
-  last_name!: string;
+  cusName: string;
 
   @Column({
     type: DataType.STRING(255),
     allowNull: false,
     unique: true,
   })
-  businessEmail!: string;
+  cusEmail: string;
 
   @Column({
     type: DataType.STRING(255),
   })
-  companyAddress: string;
+  cusPhone: string;
 
   @Column({
     type: DataType.STRING(255),
     allowNull: false,
   })
-  password!: string;
+  cusAddr: string;
 }
