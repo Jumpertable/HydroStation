@@ -1,17 +1,41 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Table,
+  Column,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  DataType,
+} from 'sequelize-typescript';
 import { Product } from 'src/product/entities/product.entity';
 
-@Entity()
-export class InventoryAlert {
-  @PrimaryGeneratedColumn()
+@Table
+export class InventoryAlert extends Model {
+  @Column({
+    type: DataType.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  })
   alertID: number;
 
-  @Column()
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
   stockLIMIT: number;
 
-  @Column()
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
   stockLIMITalert: number;
 
-  @ManyToOne(() => Product, (product) => product.productID)
+  @ForeignKey(() => Product)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  productID: number;
+
+  @BelongsTo(() => Product)
   product: Product;
 }

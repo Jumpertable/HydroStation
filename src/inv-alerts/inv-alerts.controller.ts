@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { InvAlertsService } from './inv-alerts.service';
-import { CreateInvAlertDto } from './dto/create-inv-alert.dto';
-import { UpdateInvAlertDto } from './dto/update-inv-alert.dto';
+import { InventoryAlert } from './entities/inv-alert.entity';
 
 @Controller('inv-alerts')
 export class InvAlertsController {
   constructor(private readonly invAlertsService: InvAlertsService) {}
 
-  @Post()
-  create(@Body() createInvAlertDto: CreateInvAlertDto) {
-    return this.invAlertsService.create(createInvAlertDto);
+  //Create Inventory Alert
+  @Post() //localhost:3100/int-alerts
+  async create(
+    @Body() alertData: Partial<InventoryAlert>,
+  ): Promise<InventoryAlert> {
+    return this.invAlertsService.create(alertData);
   }
 
-  @Get()
+  //Gett all alerts
+  @Get() //localhost:3100/int-alerts
   findAll() {
     return this.invAlertsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  //Get alerts by id
+  @Get(':id') //localhost:3100/int-alerts/:id
+  async findOne(@Param('id') id: number): Promise<InventoryAlert> {
     return this.invAlertsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInvAlertDto: UpdateInvAlertDto) {
-    return this.invAlertsService.update(+id, updateInvAlertDto);
+  //Update alerts
+  @Put(':id') //localhost:3100/int-alerts/:id
+  async update(
+    @Param('id') id: number,
+    @Body() updateData: Partial<InventoryAlert>,
+  ): Promise<InventoryAlert> {
+    return this.invAlertsService.update(id, updateData);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: number): Promise<void> {
     return this.invAlertsService.remove(+id);
   }
 }
+
+//I may be a little confused on this one
