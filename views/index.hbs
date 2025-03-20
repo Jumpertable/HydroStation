@@ -1,0 +1,143 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Login & Register</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #76f2a6;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 500px;
+      }
+      .logo {
+        width: 150px;
+        margin-bottom: 20px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      input {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .error {
+        color: red;
+        font-size: 12px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .login-btn {
+        background: rgb(60, 228, 243);
+        color: white;
+      }
+      .register-btn {
+        background: rgb(51, 94, 247);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <img src='\images\logo.jpg' alt='sell' class='logo' />
+      <h2 id='formTitle'>Login</h2>
+
+      <form id='loginForm'>
+        <div class='form-group'>
+          <input
+            type='text'
+            id='loginEmail'
+            placeholder='Business Email'
+            required
+          />
+          <span class='error' id='loginEmailError'></span>
+          <input
+            type='password'
+            id='loginPassword'
+            placeholder='Password'
+            required
+          />
+          <span class='error' id='loginPassError'></span>
+        </div>
+        <button type='submit' class='login-btn'>Login</button>
+        <button
+          type='button'
+          class='register-btn'
+          id='showRegister'
+        >Register</button>
+      </form>
+
+      <form id='registerForm' style='display: none;'>
+        <div class='form-group'>
+          <input
+            type='text'
+            id='businessEmail'
+            placeholder='Business Email'
+            required
+          />
+          <span class='error' id='businessEmailError'></span>
+          <input type='text' id='firstname' placeholder='First Name' required />
+          <span class='error' id='fnameError'></span>
+          <input type='text' id='lastname' placeholder='Last Name' required />
+          <span class='error' id='lnameError'></span>
+          <input
+            type='text'
+            id='companyAddress'
+            placeholder='Company Address'
+            required
+          />
+          <span class='error' id='addressError'></span>
+          <input
+            type='text'
+            id='managerName'
+            placeholder='Manager Name'
+            required
+          />
+          <span class='error' id='managerError'></span>
+          <input
+            type='password'
+            id='password'
+            placeholder='Password'
+            required
+          />
+          <span class='error' id='passError'></span>
+        </div>
+        <button type='submit' class='login-btn'>Register</button>
+        <button type='button' class='register-btn' id='showLogin'>Back to Login</button>
+      </form>
+    </div>
+
+    <script>
+      document.getElementById("showRegister").addEventListener("click",
+      function() { document.getElementById("loginForm").style.display = "none";
+      document.getElementById("registerForm").style.display = "block";
+      document.getElementById("formTitle").textContent = "Register"; });
+      document.getElementById("showLogin").addEventListener("click", function()
+      { document.getElementById("registerForm").style.display = "none";
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("formTitle").textContent = "Login"; });
+    </script>
+  </body>
+</html>

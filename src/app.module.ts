@@ -17,13 +17,16 @@ import { ProductModule } from './product/product.module';
 import { Product } from './product/entities/product.entity';
 import { InvAlertsModule } from './inv-alerts/inv-alerts.module';
 import { InventoryAlert } from './inv-alerts/entities/inv-alert.entity';
+import { Order } from './order/entities/order.entity';
+import { OrderItems } from './orderitem/entities/orderitem.entity';
 import { OrderModule } from './order/order.module';
-import { OrderitemModule } from './orderitem/orderitem.module';
+import { OrderItemsModule } from './orderitem/orderitem.module';
 import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    SequelizeModule.forFeature([Order, OrderItems, Product]),
     SequelizeModule.forRoot({
       dialect: process.env.DB_DIALECT as Dialect,
       host: process.env.DB_HOST,
@@ -31,7 +34,15 @@ import { PaymentModule } from './payment/payment.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      models: [Employee, Manager, Customer, Product, ],
+      models: [
+        Employee,
+        Manager,
+        Customer,
+        Product,
+        InventoryAlert,
+        Order,
+        OrderItems,
+      ],
       autoLoadModels: true,
       sync: { alter: true },
     }),
@@ -44,7 +55,7 @@ import { PaymentModule } from './payment/payment.module';
     ProductModule,
     InvAlertsModule,
     OrderModule,
-    OrderitemModule,
+    OrderItemsModule,
     PaymentModule,
   ],
   controllers: [AppController],

@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { OrderitemService } from './orderitem.service';
-import { CreateOrderitemDto } from './dto/create-orderitem.dto';
-import { UpdateOrderitemDto } from './dto/update-orderitem.dto';
+import { Controller, Post, Get, Delete, Param, Body } from '@nestjs/common';
+import { OrderItemsService } from './orderitem.service';
 
-@Controller('orderitem')
-export class OrderitemController {
-  constructor(private readonly orderitemService: OrderitemService) {}
+@Controller('order-items')
+export class OrderItemsController {
+  constructor(private readonly orderItemsService: OrderItemsService) {}
 
   @Post()
-  create(@Body() createOrderitemDto: CreateOrderitemDto) {
-    return this.orderitemService.create(createOrderitemDto);
+  async create(
+    @Body() body: { orderID: number; productID: number; amount: number },
+  ) {
+    return this.orderItemsService.create(
+      body.orderID,
+      body.productID,
+      body.amount,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.orderitemService.findAll();
+  async findAll() {
+    return this.orderItemsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderitemService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderitemDto: UpdateOrderitemDto) {
-    return this.orderitemService.update(+id, updateOrderitemDto);
+  async findOne(@Param('id') id: number) {
+    return this.orderItemsService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderitemService.remove(+id);
+  async remove(@Param('id') id: number) {
+    return this.orderItemsService.remove(id);
   }
 }

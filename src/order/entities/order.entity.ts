@@ -1,24 +1,44 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  Table,
   Column,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
+
 import { Customer } from 'src/customer/entities/customer.entity';
-import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
+import { OrderItems } from 'src/orderitem/entities/orderitem.entity';
 
-@Entity()
-export class Order {
-  @PrimaryGeneratedColumn()
-  orderID: number;
+@Table({
+  tableName: 'orders',
+  timestamps: true,
+})
+export class Order extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  OrderID: number;
 
-  @Column()
-  orderTotal: number;
+  //link to custoer
+  @ForeignKey(() => Customer)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  cusID: number;
 
-  @ManyToOne(() => Customer, (customer) => customer.cusID)
+  @BelongsTo(() => Customer)
   customer: Customer;
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
-  orderItems: OrderItem[];
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  OrderTotal: number;
 }
