@@ -20,8 +20,9 @@ export class Manager extends Model {
   @Column({
     type: DataType.STRING(255),
     allowNull: false,
+    unique: true,
   })
-  businessEmail: string;
+  businessEmail!: string;
 
   @Column({
     type: DataType.STRING(255),
@@ -32,5 +33,5 @@ export class Manager extends Model {
     type: DataType.STRING(255),
     allowNull: false,
   })
-  password: string;
+  password!: string;
 }

@@ -35,12 +35,19 @@ export class ManagerService {
 
   async update(id: number, managerRegisterDto: ManagerRegisterDto) {
     const manager = await this.findOne(id);
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(managerRegisterDto.password, salt);
+
+    // If password is being updated, hash it; otherwise, keep the old one
+    let hashedPassword = manager.password;
+    if (managerRegisterDto.password) {
+      const salt = await genSalt(10);
+      hashedPassword = await hash(managerRegisterDto.password, salt);
+    }
+
     await manager.update({
       ...managerRegisterDto,
-      password: hashedPassword,
+      password: hashedPassword, // Ensure only updated if provided
     });
+
     return manager;
   }
 

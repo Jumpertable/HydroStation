@@ -81,30 +81,52 @@ export class AuthService {
   //Manager Login
 
   async login(managerLoginDto: ManagerLoginDto) {
+    console.log('📥 Received Login Request:', managerLoginDto);
+
     const manager = await this.managerModel.findOne({
       where: { businessEmail: managerLoginDto.businessEmail },
+      attributes: ['businessEmail', 'password'],
+      raw: true,
     });
+
+    console.log(
+      '🔍 Running Query:',
+      `SELECT * FROM managers WHERE businessEmail = '${managerLoginDto.businessEmail}'`,
+    );
+
     if (!manager) {
-      throw new UnauthorizedException('WHERE IS THE MANAGER!!!');
+      console.error('❌ Manager not found in the database');
+      throw new UnauthorizedException('WHERE IS THE MANAGER!?!');
     }
 
-    console.log('Manager Password:', manager.password);
+    console.log('✅ Manager Found:', manager);
+    console.log('🔑 Stored Hash (from DB):', manager.password);
+    console.log('🔑 Entered Password:', managerLoginDto.password);
+
+    if (!manager.password) {
+      console.error('❌ Manager password is missing from DB!');
+      throw new UnauthorizedException('Manager password is missing.');
+    }
 
     const isValid = await compare(managerLoginDto.password, manager.password);
     if (!isValid) {
-      throw new UnauthorizedException('INCORRCT PASSWORD!!!');
+      console.error('❌ Incorrect password');
+      throw new UnauthorizedException('INCORRECT PASSWORD!!!');
     }
 
     const payload = { user_id: manager.id };
     const token = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_SECRET_KEY,
+      secret: process.env.JWT_SECRET_KEY || 'default_secret_key',
     });
 
     return { access_token: token };
   }
+
   async getManagerProfile(id: number) {
     return await this.managerModel.findByPk(id, {
       attributes: ['id', 'first_name', 'last_name', 'businessEmail'],
     });
   }
 }
+
+//Why does this have to be so painful
