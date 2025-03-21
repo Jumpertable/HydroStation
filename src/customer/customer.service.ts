@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Customer } from './entities/customer.entity';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -25,16 +26,23 @@ export class CustomerService {
     return customer;
   }
 
-  async update(id: number, updateData: Partial<Customer>): Promise<Customer> {
-    const [affectedCount] = await this.customerModel.update(updateData, {
-      where: { cusID: id },
+  async update(
+    cusID: number,
+    updateData: UpdateCustomerDto,
+  ): Promise<Customer> {
+    console.log(`Looking for customer with ID: ${cusID}`);
+
+    const customer = await this.customerModel.findOne({
+      where: { cusID },
     });
 
-    if (affectedCount === 0) {
-      throw new Error(`Customer with ID ${id} not found`);
+    console.log('Customer found:', customer);
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${cusID} not found`);
     }
 
-    return this.findOne(id); // Fetch the updated entity
+    return await customer.update(updateData);
   }
 
   async remove(id: number): Promise<void> {

@@ -12,11 +12,10 @@ import {
   timestamps: false,
 })
 export class Customer extends Model {
-  @PrimaryKey // Mark as primary key
-  @AutoIncrement //incrementing ID
+  @PrimaryKey
+  @AutoIncrement //ID++
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
   })
   cusID: number;
 
@@ -40,7 +39,6 @@ export class Customer extends Model {
 
   @Column({
     type: DataType.STRING(255),
-    allowNull: false,
   })
   cusAddr: string;
 }
