@@ -17,13 +17,13 @@ export class OrderItemsController {
   }
 
   @Get()
-  async findAll() {
+  findAll() {
     return this.orderItemsService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return this.orderItemsService.findOne(id);
+  @Get(':orderID')
+  findByOrder(@Param('orderID') orderID: number) {
+    return this.orderItemsService.findByOrder(orderID);
   }
 
   @Delete(':id')

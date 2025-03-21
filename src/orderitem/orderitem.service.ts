@@ -28,8 +28,6 @@ export class OrderItemsService {
       throw new NotFoundException(`Order with ID ${orderID} not found`);
     }
 
-    const itemTotal = product.productPrice * amount;
-
     const orderItem = await this.orderItemsModel.create({
       orderID,
       productID,
@@ -37,18 +35,17 @@ export class OrderItemsService {
       productPrice: product.productPrice,
     });
 
-    // Reduce product stock
-    product.productStock -= amount;
+    product.productStock -= amount; //reduce -=
     await product.save();
 
     return orderItem;
   }
 
-  async findAll() {
+  async findAll(): Promise<OrderItems[]> {
     return this.orderItemsModel.findAll({ include: [Order, Product] });
   }
 
-  async findOne(orderItemID: number) {
+  async findByOrder(orderItemID: number): Promise<OrderItems[]> {
     const orderItem = await this.orderItemsModel.findByPk(orderItemID, {
       include: [Order, Product],
     });
@@ -57,11 +54,27 @@ export class OrderItemsService {
         `Order item with ID ${orderItemID} not found`,
       );
     }
-    return orderItem;
+    return this.orderItemsModel.findAll({
+      where: { OrderID: Order },
+      include: [Product],
+    });
   }
 
   async remove(orderItemID: number) {
-    const orderItem = await this.findOne(orderItemID);
-    await orderItem.destroy();
+    const orderItems = await this.findByOrder(orderItemID);
+
+    if (!orderItems || orderItems.length === 0) {
+      throw new NotFoundException(
+        `No order items found with ID ${orderItemID}`,
+      );
+    }
+
+    for (const item of orderItems) {
+      await item.destroy();
+    }
+
+    return {
+      message: `Order items with ID ${orderItemID} deleted successfully`,
+    };
   }
 }

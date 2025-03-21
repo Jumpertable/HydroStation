@@ -7,8 +7,8 @@ import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Order, OrderItems, Product])], // ✅ Ensure all models are imported
-  providers: [OrderService], 
+  imports: [SequelizeModule.forFeature([Order, OrderItems, Product])],
+  providers: [OrderService],
   controllers: [OrderController],
 })
 export class OrderModule {}

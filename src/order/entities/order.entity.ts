@@ -10,7 +10,6 @@ import {
 } from 'sequelize-typescript';
 
 import { Customer } from 'src/customer/entities/customer.entity';
-import { OrderItems } from 'src/orderitem/entities/orderitem.entity';
 
 @Table({
   tableName: 'orders',

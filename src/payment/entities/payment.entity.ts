@@ -1,26 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Table,
+  Column,
+  Model,
+  ForeignKey,
+  DataType,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { Order } from 'src/order/entities/order.entity';
 
-@Entity()
-export class Customer {
-  @PrimaryGeneratedColumn()
-  cusID: number;
-
-  @Column()
-  cusName: string;
-
-  @Column()
-  cusEmail: string;
-
-  @Column()
-  cusPhone: string;
-
-  @Column()
-  cusAddr: string;
-
-  @OneToMany(() => Order, (order) => order.customer, {
-    cascade: true,
-    onDelete: 'CASCADE',
+@Table({
+  tableName: 'payments',
+  timestamps: true,
+})
+export class Payment extends Model {
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
   })
-  orders: Order[];
+  amountPaid: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  paymentMethod: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  paymentStatus: string;
+
+  @ForeignKey(() => Order)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  OrderID: number;
+
+  @BelongsTo(() => Order)
+  order: Order;
 }
