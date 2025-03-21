@@ -1,6 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './entities/product.entity';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -9,8 +15,12 @@ export class ProductService {
     private readonly productModel: typeof Product,
   ) {}
 
-  async create(productData: Partial<Product>): Promise<Product> {
-    return this.productModel.create(productData);
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    try {
+      return await this.productModel.create({ ...createProductDto });
+    } catch (error) {
+      throw new BadRequestException('Invalid product data: ' + error.message);
+    }
   }
 
   async findAll(): Promise<Product[]> {
@@ -37,25 +47,26 @@ export class ProductService {
     return product;
   }
 
-  async update(id: number, updateData: Partial<Product>): Promise<Product> {
-    const [affectedRows] = await this.productModel.update(updateData, {
-      where: { productID: id },
+  async update(
+    productID: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    const product = await this.productModel.findOne({
+      where: { productID },
     });
-
-    if (affectedRows == 0) {
-      throw new Error(`Product with ID ${id} not found`);
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productID} not found`);
     }
-
-    return this.findOne(id);
+    return product.update(updateProductDto);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(productID: number): Promise<void> {
     const deletedRows = await this.productModel.destroy({
-      where: { productID: id },
+      where: { productID: productID },
     });
 
     if (deletedRows === 0) {
-      throw new Error(`Product with ID ${id} not found`);
+      throw new Error(`Product with ID ${productID} not found`);
     }
   }
 }

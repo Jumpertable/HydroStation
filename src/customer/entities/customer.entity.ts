@@ -16,6 +16,7 @@ export class Customer extends Model {
   @AutoIncrement //ID++
   @Column({
     type: DataType.INTEGER,
+    allowNull: false,
   })
   cusID: number;
 

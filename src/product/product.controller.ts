@@ -6,9 +6,12 @@ import {
   Put,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -16,8 +19,8 @@ export class ProductController {
 
   //create Product
   @Post() //localhost:3100/product
-  async create(@Body() productData: Partial<Product>): Promise<Product> {
-    return this.productService.create(productData);
+  async create(@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto);
   }
 
   //Get All Products
@@ -34,17 +37,17 @@ export class ProductController {
   }
 
   //update a product's data
-  @Put('/update/:id') //localhost:3100/product/update/:id
+  @Put('/update/:productID') //localhost:3100/product/update/:id
   async update(
-    @Param('id') id: string,
-    @Body() updateData: Partial<Product>,
-  ): Promise<Product> {
-    return this.productService.update(parseInt(id, 10), updateData);
+    @Param('productID', ParseIntPipe) productID: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.update(productID, updateProductDto);
   }
 
   //obliterate product
-  @Delete('/delete/:id') //localhost:3100/product/delete/:id
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.productService.remove(parseInt(id, 10));
+  @Delete('/delete/:productID') //localhost:3100/product/delete/:id
+  async remove(@Param('productID') productID: string): Promise<void> {
+    return this.productService.remove(parseInt(productID, 10));
   }
 }

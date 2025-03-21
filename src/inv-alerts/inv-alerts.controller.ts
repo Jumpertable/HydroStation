@@ -19,7 +19,12 @@ export class InvAlertsController {
   async create(
     @Body() alertData: Partial<InventoryAlert>,
   ): Promise<InventoryAlert> {
-    return this.invAlertsService.create(alertData);
+    return this.invAlertsService.create(
+      alertData,
+      productID,
+      stockLimit,
+      stockLimitAlert,
+    );
   }
 
   //Gett all alerts

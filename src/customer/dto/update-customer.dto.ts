@@ -5,7 +5,6 @@ export class UpdateCustomerDto {
   @IsString()
   cusName?: string;
 
-  @IsOptional()
   @IsEmail()
   cusEmail?: string;
 

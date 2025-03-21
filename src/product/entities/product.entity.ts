@@ -5,7 +5,9 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  HasMany,
 } from 'sequelize-typescript';
+import { InventoryAlert } from 'src/inv-alerts/entities/inv-alert.entity';
 
 @Table({
   tableName: 'products',
@@ -25,6 +27,9 @@ export class Product extends Model {
     allowNull: false,
   })
   productName: string;
+
+  @HasMany(() => InventoryAlert)
+  inventoryAlerts: InventoryAlert[];
 
   @Column({
     type: DataType.TEXT,
