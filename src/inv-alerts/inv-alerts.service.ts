@@ -12,11 +12,10 @@ export class InvAlertsService {
   ) {}
 
   async create(
-    alertData,
     productID: number,
     stockLimit: number,
-    stockLimitAlert: number,
-  ) {
+    stockLimitAlert: string,
+  ): Promise<InventoryAlert> {
     const product = await this.productModel.findByPk(productID);
     if (!product) {
       throw new NotFoundException(

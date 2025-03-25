@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  BadRequestException,
 } from '@nestjs/common';
 import { InvAlertsService } from './inv-alerts.service';
 import { InventoryAlert } from './entities/inv-alert.entity';
@@ -19,11 +20,34 @@ export class InvAlertsController {
   async create(
     @Body() alertData: Partial<InventoryAlert>,
   ): Promise<InventoryAlert> {
+    const { productID, stockLimit, stockLimitAlert } = alertData;
+    let newStockLimitAlert: string = '';
+
+    if (!productID || typeof productID !== 'number') {
+      throw new BadRequestException(
+        'Invalid or missing productID. It must be a number.',
+      );
+    }
+    if (!stockLimit || typeof stockLimit !== 'number') {
+      throw new BadRequestException(
+        'Invalid or missing stockLimit. It must be a number.',
+      );
+    }
+    if (typeof stockLimitAlert !== 'string') {
+      throw new BadRequestException(
+        'Invalid or missing stockLimitAlert. It must be a boolean.',
+      );
+    }
+
+    if (stockLimit < 10) {
+      newStockLimitAlert = `Warning! the stock for ${productID} is under 10`;
+    }
+
     return this.invAlertsService.create(
-      alertData,
+      // alertData,
       productID,
       stockLimit,
-      stockLimitAlert,
+      newStockLimitAlert,
     );
   }
 

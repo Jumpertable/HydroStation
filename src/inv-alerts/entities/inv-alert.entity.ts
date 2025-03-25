@@ -8,7 +8,6 @@ import {
 } from 'sequelize-typescript';
 import { Product } from 'src/product/entities/product.entity';
 
-
 @Table
 export class InventoryAlert extends Model {
   @Column({
@@ -25,11 +24,10 @@ export class InventoryAlert extends Model {
   stockLimit: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TEXT,
     allowNull: false,
-    defaultValue: 5,
   })
-  stockLimitAlert: number;
+  stockLimitAlert: string;
 
   @ForeignKey(() => Product)
   @Column({
