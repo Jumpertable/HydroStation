@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { InvAlertsService } from './inv-alerts.service';
 import { InventoryAlert } from './entities/inv-alert.entity';
@@ -18,10 +19,9 @@ export class InvAlertsController {
   //Create Inventory Alert
   @Post() //localhost:3100/int-alerts
   async create(
-    @Body() alertData: Partial<InventoryAlert>,
+    @Body() alertData: { productID: number; stockLimit: number },
   ): Promise<InventoryAlert> {
-    const { productID, stockLimit, stockLimitAlert } = alertData;
-    let newStockLimitAlert: string = '';
+    const { productID, stockLimit } = alertData;
 
     if (!productID || typeof productID !== 'number') {
       throw new BadRequestException(
@@ -33,34 +33,23 @@ export class InvAlertsController {
         'Invalid or missing stockLimit. It must be a number.',
       );
     }
-    if (typeof stockLimitAlert !== 'string') {
-      throw new BadRequestException(
-        'Invalid or missing stockLimitAlert. It must be a boolean.',
-      );
-    }
 
-    if (stockLimit < 10) {
-      newStockLimitAlert = `Warning! the stock for ${productID} is under 10`;
-    }
-
-    return this.invAlertsService.create(
-      // alertData,
-      productID,
-      stockLimit,
-      newStockLimitAlert,
-    );
+    return this.invAlertsService.create(productID, stockLimit);
   }
 
   //Gett all alerts
   @Get() //localhost:3100/int-alerts
-  findAll() {
-    return this.invAlertsService.findAll();
+  async createAlert(@Body() body: { productID: number; stockLimit: number }) {
+    return this.invAlertsService.create(body.productID, body.stockLimit);
   }
 
   //Get alerts by id
-  @Get(':id') //localhost:3100/int-alerts/:id
-  async findOne(@Param('id') id: number): Promise<InventoryAlert> {
-    return this.invAlertsService.findOne(+id);
+  @Get('/check/:id') //localhost:3100/int-alerts/check/:id
+  async checkStock(
+    @Query('productID') productID: number,
+    @Query('stockLimit') stockLimit: number,
+  ) {
+    return this.invAlertsService.checkStockLimit(productID, stockLimit);
   }
 
   //Update alerts

@@ -28,13 +28,12 @@ export class Customer extends Model {
 
   @Column({
     type: DataType.STRING(255),
-    allowNull: false,
     unique: true,
   })
   cusEmail: string;
 
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.STRING(15),
   })
   cusPhone: string;
 

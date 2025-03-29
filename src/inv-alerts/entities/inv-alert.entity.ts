@@ -24,10 +24,10 @@ export class InventoryAlert extends Model {
   stockLimit: number;
 
   @Column({
-    type: DataType.TEXT,
+    type: DataType.BOOLEAN,
     allowNull: false,
   })
-  stockLimitAlert: string;
+  stockLimitAlert: boolean;
 
   @ForeignKey(() => Product)
   @Column({
@@ -35,6 +35,13 @@ export class InventoryAlert extends Model {
     allowNull: false,
   })
   productID: number;
+
+  @ForeignKey(() => Product)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  productStock: number;
 
   @BelongsTo(() => Product)
   product: Product;

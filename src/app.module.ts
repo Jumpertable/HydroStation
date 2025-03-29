@@ -26,7 +26,6 @@ import { PaymentModule } from './payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    SequelizeModule.forFeature([Order, OrderItems, Product]),
     SequelizeModule.forRoot({
       dialect: process.env.DB_DIALECT as Dialect,
       host: process.env.DB_HOST,
@@ -43,9 +42,16 @@ import { PaymentModule } from './payment/payment.module';
         Order,
         OrderItems,
       ],
-      autoLoadModels: true,
-      sync: { alter: true },
+      autoLoadModels: false,
+      synchronize: true,
     }),
+    SequelizeModule.forFeature([
+      Employee,
+      Manager,
+      Customer,
+      Product,
+      InventoryAlert,
+    ]),
     EmployeeModule,
     ManagerModule,
     UtilityModule,

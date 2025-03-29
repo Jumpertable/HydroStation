@@ -11,17 +11,16 @@ export class InvAlertsService {
     @InjectModel(Product) private productModel: typeof Product,
   ) {}
 
-  async create(
-    productID: number,
-    stockLimit: number,
-    stockLimitAlert: string,
-  ): Promise<InventoryAlert> {
+  async create(productID: number, stockLimit: number): Promise<InventoryAlert> {
     const product = await this.productModel.findByPk(productID);
     if (!product) {
       throw new NotFoundException(
         `Product with ID ${productID} does not exist.`,
       );
     }
+
+    // Determine if stock is safe or in danger
+    const stockLimitAlert = product.productStock > stockLimit;
 
     const newAlert = await this.inventoryAlertModel.create({
       productID,
@@ -67,5 +66,22 @@ export class InvAlertsService {
     if (deletedCount === 0) {
       throw new NotFoundException(`Inventory Alert with ID ${id} not found`);
     }
+  }
+
+  async checkStockLimit(productID: number, stockLimit: number) {
+    const product = await this.productModel.findByPk(productID);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const stockLimitAlert = product.productStock > stockLimit;
+
+    return {
+      productID: product.productID,
+      productName: product.productName,
+      stockLimit,
+      stockLimitAlert,
+      message: stockLimitAlert ? 'You are safe' : "You're in the danger zone",
+    };
   }
 }

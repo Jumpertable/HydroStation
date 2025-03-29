@@ -3,10 +3,13 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+  getHello(): any {
+    throw new Error('Method not implemented.');
+  }
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @Render('index') // This should match index.hbs, index.ejs, or index.pug
+  @Render('index')
   root() {
     return { message: 'Welcome to HydroStation!' };
   }

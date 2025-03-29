@@ -10,6 +10,7 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
+    SequelizeModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY || 'default_secret',
@@ -19,5 +20,6 @@ import { JwtStrategy } from './jwt.strategy';
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}
