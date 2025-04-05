@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   Put,
-  BadRequestException,
   Query,
 } from '@nestjs/common';
 import { InvAlertsService } from './inv-alerts.service';
@@ -16,44 +15,29 @@ import { InventoryAlert } from './entities/inv-alert.entity';
 export class InvAlertsController {
   constructor(private readonly invAlertsService: InvAlertsService) {}
 
-  //Create Inventory Alert
-  @Post() //localhost:3100/int-alerts
-  async create(
-    @Body() alertData: { productID: number; stockLimit: number },
-  ): Promise<InventoryAlert> {
-    const { productID, stockLimit } = alertData;
-
-    if (!productID || typeof productID !== 'number') {
-      throw new BadRequestException(
-        'Invalid or missing productID. It must be a number.',
-      );
-    }
-    if (!stockLimit || typeof stockLimit !== 'number') {
-      throw new BadRequestException(
-        'Invalid or missing stockLimit. It must be a number.',
-      );
-    }
-
-    return this.invAlertsService.create(productID, stockLimit);
+  //Get alerts by id or product name
+  @Get('/check') //localhost:3100/int-alerts/check?productId= ... pr productName= ...
+  async checkStock(
+    @Query('productID') productID: number,
+    @Query('stockLimit') stockLimit: number,
+    @Query('productName') productName?: string,
+  ) {
+    return this.invAlertsService.checkStockLimit(
+      productID,
+      stockLimit ?? 50,
+      productName,
+    );
   }
 
-  //Gett all alerts
-  @Get() //localhost:3100/int-alerts
+  @Post()
+  async create() {}
+
+  @Get()
   async createAlert(@Body() body: { productID: number; stockLimit: number }) {
     return this.invAlertsService.create(body.productID, body.stockLimit);
   }
 
-  //Get alerts by id
-  @Get('/check/:id') //localhost:3100/int-alerts/check/:id
-  async checkStock(
-    @Query('productID') productID: number,
-    @Query('stockLimit') stockLimit: number,
-  ) {
-    return this.invAlertsService.checkStockLimit(productID, stockLimit);
-  }
-
-  //Update alerts
-  @Put(':id') //localhost:3100/int-alerts/:id
+  @Put()
   async update(
     @Param('id') id: number,
     @Body() updateData: Partial<InventoryAlert>,
@@ -61,7 +45,7 @@ export class InvAlertsController {
     return this.invAlertsService.update(id, updateData);
   }
 
-  @Delete(':id')
+  @Delete()
   async remove(@Param('id') id: number): Promise<void> {
     return this.invAlertsService.remove(+id);
   }

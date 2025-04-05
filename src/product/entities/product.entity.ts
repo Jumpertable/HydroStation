@@ -13,44 +13,44 @@ import { InventoryAlert } from 'src/inv-alerts/entities/inv-alert.entity';
   tableName: 'products',
   timestamps: false,
 })
-export class Product extends Model {
+export class Product extends Model<Product> {
   @PrimaryKey
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  productID: number;
+  declare productID: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  productName: string;
+  declare productName: string;
 
   @HasMany(() => InventoryAlert)
-  inventoryAlerts: InventoryAlert[];
+  inventoryAlerts!: InventoryAlert[];
 
   @Column({
     type: DataType.TEXT,
   })
-  productDes: string;
+  productDes?: string;
 
   @Column({
     type: DataType.FLOAT,
     allowNull: false,
   })
-  productPrice: number;
+  productPrice!: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  productStock: number;
+  declare productStock: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  productBrand: string;
+  productBrand!: string;
 }

@@ -68,8 +68,23 @@ export class InvAlertsService {
     }
   }
 
-  async checkStockLimit(productID: number, stockLimit: number) {
-    const product = await this.productModel.findByPk(productID);
+  async checkStockLimit(
+    productID?: number,
+    stockLimit: number = 50,
+    productName?: string,
+  ) {
+    let product: Product | null = null;
+
+    if (productID) {
+      product = await this.productModel.findByPk(productID);
+    } else if (productName) {
+      product = await this.productModel.findOne({
+        where: { productName },
+      });
+    }
+
+    console.log('Fetched Product:', product);
+
     if (!product) {
       throw new NotFoundException('Product not found');
     }
@@ -79,9 +94,12 @@ export class InvAlertsService {
     return {
       productID: product.productID,
       productName: product.productName,
+      productStock: product.productStock,
       stockLimit,
       stockLimitAlert,
-      message: stockLimitAlert ? 'You are safe' : "You're in the danger zone",
+      message: stockLimitAlert
+        ? 'You are safe ヾ(≧▽≦*)o.'
+        : `Hey! You're running low on ${product.productName}, time to restock!`,
     };
   }
 }

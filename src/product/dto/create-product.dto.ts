@@ -17,5 +17,5 @@ export class CreateProductDto {
   productStock: number;
 
   @IsString()
-  productBrand?: string;
+  productBrand: string;
 }

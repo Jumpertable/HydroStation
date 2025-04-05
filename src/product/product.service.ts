@@ -17,7 +17,7 @@ export class ProductService {
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
     try {
-      return await this.productModel.create({ ...createProductDto });
+      return await this.productModel.create(createProductDto as any);
     } catch (error) {
       throw new BadRequestException('Invalid product data: ' + error.message);
     }
