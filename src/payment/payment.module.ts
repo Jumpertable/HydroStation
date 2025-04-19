@@ -9,6 +9,5 @@ import { Order } from 'src/order/entities/order.entity';
   imports: [SequelizeModule.forFeature([Payment, Order])],
   controllers: [PaymentController],
   providers: [PaymentService],
-  exports: [PaymentService],
 })
 export class PaymentModule {}

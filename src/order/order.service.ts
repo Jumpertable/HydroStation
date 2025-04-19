@@ -1,61 +1,101 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
-import { OrderItems } from 'src/orderitem/entities/orderitem.entity';
+import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { Payment } from 'src/payment/entities/payment.entity';
+
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(Order) private readonly orderModel: typeof Order,
-    @InjectModel(OrderItems) private readonly orderItemModel: typeof OrderItems,
-    @InjectModel(Product) private readonly productModel: typeof Product,
+    @InjectModel(Order) private orderModel: typeof Order,
+    @InjectModel(OrderItem) private orderItemModel: typeof OrderItem,
+    @InjectModel(Product) private productModel: typeof Product,
   ) {}
 
-  async create(cusID: number, items: { productID: number; amount: number }[]) {
-    let total = 0;
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const { cusID, items } = createOrderDto;
 
-    const order = await this.orderModel.create({ cusID, OrderTotal: 0 });
+    if (!cusID || !items || !Array.isArray(items)) {
+      throw new Error('Missing or invalid order data');
+    }
 
+    let orderTotal = 0;
+    const productsMap = new Map<number, Product>();
+
+    // Validate and prepare product data
     for (const item of items) {
       const product = await this.productModel.findByPk(item.productID);
-      if (!product || product.productStock < item.amount) {
-        throw new NotFoundException(
-          `Not enough stock for product ID ${item.productID}`,
-        );
+
+      if (!product) {
+        throw new Error(`Product with ID ${item.productID} not found`);
       }
 
-      const itemTotal = product.productPrice * item.amount;
-      total += itemTotal;
+      if (product.productStock < item.amount) {
+        throw new Error(`Not enough stock for ${product.productName}`);
+      }
 
-      await this.orderItemModel.create({
-        OrderID: order.OrderID,
-        ProductID: item.productID,
-        amount: item.amount,
-        ProductPrice: product.productPrice,
-      });
+      if (typeof product.productPrice !== 'number') {
+        throw new Error(`Invalid price for product ID ${product.productID}`);
+      }
+
+      orderTotal += product.productPrice * item.amount;
+      productsMap.set(item.productID, product);
+    }
+
+    console.log('cusID:', cusID);
+    console.log('Final orderTotal:', orderTotal);
+
+    //Create the order
+    const order = await this.orderModel.create({
+      cusID,
+      orderTotal,
+    } as any);
+
+    //Create each order item and update stock
+    for (const item of items) {
+      const product = productsMap.get(item.productID)!;
 
       product.productStock -= item.amount;
       await product.save();
+
+      await this.orderItemModel.create({
+        orderID: order.orderID,
+        productID: product.productID,
+        amount: item.amount,
+        productPrice: product.productPrice,
+      });
+
+      product.productStock -= item.amount;
     }
 
-    order.OrderTotal = total;
-    await order.save();
-
     return order;
   }
 
-  async findAll() {
-    return this.orderModel.findAll({ include: [OrderItems] });
-  }
+  //order/cus/:cusID
+  async findByCusId(cusID: number): Promise<any[]> {
+    const orders = await this.orderModel.findAll({
+      where: { cusID },
+      include: [
+        {
+          model: OrderItem,
+          as: 'orderItems',
+          include: [Product],
+        },
+        {
+          model: Payment,
+        },
+      ],
+    });
 
-  async findOne(id: number) {
-    const order = await this.orderModel.findByPk(id, { include: [OrderItems] });
-    if (!order) throw new NotFoundException(`Order with ID ${id} not found`);
-    return order;
-  }
-
-  async remove(id: number) {
-    const order = await this.findOne(id);
-    await order.destroy();
+    // ✅ Transform and add "paymentStatus"
+    return orders.map((order) => {
+      const plain = order.get({ plain: true });
+      return {
+        ...plain,
+        paymentStatus: plain.payment ? 'Paid' : 'Unpaid',
+      };
+    });
   }
 }

@@ -32,15 +32,10 @@ export class Product extends Model<Product> {
   inventoryAlerts!: InventoryAlert[];
 
   @Column({
-    type: DataType.TEXT,
-  })
-  productDes?: string;
-
-  @Column({
     type: DataType.FLOAT,
     allowNull: false,
   })
-  productPrice!: number;
+  declare productPrice: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -48,9 +43,12 @@ export class Product extends Model<Product> {
   })
   declare productStock: number;
 
+  @Column(DataType.STRING)
+  productDes?: string;
+
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  productBrand!: string;
+  declare productBrand: string;
 }

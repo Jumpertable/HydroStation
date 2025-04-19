@@ -2,42 +2,46 @@ import {
   Table,
   Column,
   Model,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
   DataType,
   PrimaryKey,
   AutoIncrement,
-  ForeignKey,
-  BelongsTo,
+  HasOne,
 } from 'sequelize-typescript';
+import {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from 'sequelize';
+import { Customer } from '../../customer/entities/customer.entity';
+import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
-import { Customer } from 'src/customer/entities/customer.entity';
-
-@Table({
-  tableName: 'orders',
-  timestamps: true,
-})
-export class Order extends Model {
+@Table({ tableName: 'Orders', timestamps: true })
+export class Order extends Model<
+  InferAttributes<Order, { omit: 'customer' | 'orderItems' }>,
+  InferCreationAttributes<Order, { omit: 'customer' | 'orderItems' }>
+> {
   @PrimaryKey
   @AutoIncrement
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  OrderID: number;
+  @Column({ type: DataType.INTEGER })
+  declare orderID: CreationOptional<number>;
 
-  //link to custoer
+  @Column(DataType.FLOAT)
+  declare orderTotal: number;
+
   @ForeignKey(() => Customer)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  cusID: number;
+  @Column
+  declare cusID: number;
 
   @BelongsTo(() => Customer)
-  customer: Customer;
+  declare customer: Customer;
 
-  @Column({
-    type: DataType.FLOAT,
-    allowNull: false,
-  })
-  OrderTotal: number;
+  @HasMany(() => OrderItem, { as: 'orderItems' })
+  declare orderItems: OrderItem[];
+
+  @HasOne(() => Payment)
+  declare payment: Payment;
 }

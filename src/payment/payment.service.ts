@@ -1,48 +1,55 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Payment } from './entities/payment.entity';
+import { CreatePaymentDto } from './dto/create-payment.dto';
+import { Order } from 'src/order/entities/order.entity';
 
 @Injectable()
 export class PaymentService {
   constructor(
-    @InjectModel(Payment) private readonly paymentModel: typeof Payment,
+    @InjectModel(Payment) private paymentModel: typeof Payment,
+    @InjectModel(Order) private orderModel: typeof Order,
   ) {}
 
-  async create(orderID: number, amount: number, method: string) {
-    return await this.paymentModel.create({ orderID, amount, method });
-  }
+  async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    const { orderID, payMethod, payTrans, amount } = createPaymentDto;
 
-  async findAll() {
-    return await this.paymentModel.findAll();
-  }
-
-  async findOne(id: number) {
-    const payment = await this.paymentModel.findByPk(id);
-    if (!payment)
-      throw new NotFoundException(`Payment with ID ${id} not found`);
-    return payment;
-  }
-
-  async findByOrder(orderID: number) {
-    return await this.paymentModel.findAll({ where: { orderID } });
-  }
-
-  async update(
-    id: number,
-    updateData: Partial<{ amount: number; method: string }>,
-  ) {
-    const payment = await this.paymentModel.findByPk(id);
-    if (!payment) {
-      throw new NotFoundException(`Payment with ID ${id} not found`);
+    const order = await this.orderModel.findByPk(orderID);
+    if (!order) {
+      throw new NotFoundException(`Order ID ${orderID} not found`);
     }
 
-    await payment.update(updateData);
+    if (order.orderTotal !== amount) {
+      throw new BadRequestException(
+        `Payment amount (${amount}) must match order total (${order.orderTotal})`,
+      );
+    }
+
+    const payment = await this.paymentModel.create({
+      orderID,
+      payMethod,
+      payTrans,
+      amount,
+    });
+
     return payment;
   }
 
-  async remove(id: number) {
-    const payment = await this.findOne(id);
-    await payment.destroy();
-    return { message: `Payment with ID ${id} deleted successfully` };
+  async findAll(): Promise<Payment[]> {
+    return this.paymentModel.findAll({ include: [Order] });
+  }
+
+  async findOne(id: number): Promise<Payment> {
+    const payment = await this.paymentModel.findByPk(id, {
+      include: [Order],
+    });
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+    return payment;
   }
 }

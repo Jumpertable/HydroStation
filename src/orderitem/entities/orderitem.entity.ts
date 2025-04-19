@@ -2,57 +2,35 @@ import {
   Table,
   Column,
   Model,
-  DataType,
-  PrimaryKey,
-  AutoIncrement,
   ForeignKey,
   BelongsTo,
+  DataType,
 } from 'sequelize-typescript';
+import { Product } from '../../product/entities/product.entity';
 import { Order } from 'src/order/entities/order.entity';
-import { Product } from 'src/product/entities/product.entity';
 
-@Table({
-  tableName: 'order_items',
-  timestamps: false,
-})
-export class OrderItems extends Model {
-  @PrimaryKey
-  @AutoIncrement
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  OrderItemID: number;
+@Table({ tableName: 'OrderItems' })
+export class OrderItem extends Model {
+  @Column({ primaryKey: true, autoIncrement: true })
+  orderItemID: number;
 
   @ForeignKey(() => Order)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  OrderID: number;
+  @Column
+  declare orderID: number;
 
   @BelongsTo(() => Order)
-  order: Order;
+  declare order: Order;
 
   @ForeignKey(() => Product)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  ProductID: number;
+  @Column
+  productID: number;
 
   @BelongsTo(() => Product)
-  product: Product;
+  declare product: Product;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
+  @Column(DataType.INTEGER)
   amount: number;
 
-  @Column({
-    type: DataType.FLOAT,
-    allowNull: false,
-  })
-  ProductPrice: number;
+  @Column(DataType.FLOAT)
+  productPrice: number;
 }

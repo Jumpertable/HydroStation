@@ -18,10 +18,11 @@ import { Product } from './product/entities/product.entity';
 import { InvAlertsModule } from './inv-alerts/inv-alerts.module';
 import { InventoryAlert } from './inv-alerts/entities/inv-alert.entity';
 import { Order } from './order/entities/order.entity';
-import { OrderItems } from './orderitem/entities/orderitem.entity';
+import { OrderItem } from './orderitem/entities/orderitem.entity';
 import { OrderModule } from './order/order.module';
 import { OrderItemsModule } from './orderitem/orderitem.module';
 import { PaymentModule } from './payment/payment.module';
+import { Payment } from './payment/entities/payment.entity';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { PaymentModule } from './payment/payment.module';
         Product,
         InventoryAlert,
         Order,
-        OrderItems,
+        OrderItem,
+        Payment,
       ],
       autoLoadModels: false,
       synchronize: true,

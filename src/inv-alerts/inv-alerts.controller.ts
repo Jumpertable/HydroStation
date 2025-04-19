@@ -15,7 +15,7 @@ import { InventoryAlert } from './entities/inv-alert.entity';
 export class InvAlertsController {
   constructor(private readonly invAlertsService: InvAlertsService) {}
 
-  //Get alerts by id or product name
+  //Get alerts by id or product name :)
   @Get('/check') //localhost:3100/int-alerts/check?productId= ... pr productName= ...
   async checkStock(
     @Query('productID') productID: number,
@@ -24,6 +24,7 @@ export class InvAlertsController {
   ) {
     return this.invAlertsService.checkStockLimit(
       productID,
+      //default to 50 because I'm already too confused
       stockLimit ?? 50,
       productName,
     );

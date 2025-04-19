@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { OrderItems } from './entities/orderitem.entity';
+import { OrderItem } from './entities/orderitem.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class OrderItemsService {
   constructor(
-    @InjectModel(OrderItems)
-    private readonly orderItemsModel: typeof OrderItems,
+    @InjectModel(OrderItem)
+    private readonly orderItemsModel: typeof OrderItem,
     @InjectModel(Order)
     private readonly orderModel: typeof Order,
     @InjectModel(Product)
@@ -35,17 +35,17 @@ export class OrderItemsService {
       productPrice: product.productPrice,
     });
 
-    product.productStock -= amount; //reduce -=
+    product.productStock -= amount; //reduce
     await product.save();
 
     return orderItem;
   }
 
-  async findAll(): Promise<OrderItems[]> {
+  async findAll(): Promise<OrderItem[]> {
     return this.orderItemsModel.findAll({ include: [Order, Product] });
   }
 
-  async findByOrder(orderItemID: number): Promise<OrderItems[]> {
+  async findByOrder(orderItemID: number): Promise<OrderItem[]> {
     const orderItem = await this.orderItemsModel.findByPk(orderItemID, {
       include: [Order, Product],
     });
