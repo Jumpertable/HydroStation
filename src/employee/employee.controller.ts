@@ -7,25 +7,27 @@ import {
   Param,
   Delete,
   NotFoundException,
+  Req,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeRegisterDto } from './dto/register.dto';
+import { EmployeeLoginDto } from './dto/login.dto';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @Post()
-  create(@Body() employeeRegisterDto: EmployeeRegisterDto) {
-    return this.employeeService.create(employeeRegisterDto);
+  @Post('login')
+  login(@Body() dto: EmployeeLoginDto) {
+    return this.employeeService.login(dto);
   }
 
-  @Get() //localhost:3100/employee/
+  @Get('profile') //localhost:3100/employee/
   findAll() {
     return this.employeeService.findAll();
   }
 
-  @Get(':id')
+  @Get('/profile/:id')
   findOne(@Param('id') id: string) {
     return this.employeeService.findOne(+id);
   }

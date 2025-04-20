@@ -4,6 +4,8 @@ import {
   DataType,
   ForeignKey,
   Model,
+  PrimaryKey,
+  AutoIncrement,
   Table,
 } from 'sequelize-typescript';
 import { Manager } from 'src/manager/entities/manager.entity';
@@ -13,48 +15,59 @@ import { Manager } from 'src/manager/entities/manager.entity';
   timestamps: false,
 })
 export class Employee extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare employeeID: number;
+
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
   })
-  first_name: string;
+  declare first_name: string;
 
   @Column({
     type: DataType.STRING(200),
     allowNull: false,
   })
-  last_name: string;
+  declare last_name: string;
 
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
     unique: true,
   })
-  businessEmail: string;
+  declare businessEmail: string;
 
   @Column({
     type: DataType.STRING(50),
   })
-  companyAddress: string;
+  declare companyAddress: string;
 
   @ForeignKey(() => Manager)
   @Column({
     type: DataType.INTEGER,
   })
-  manager_id: number;
+  declare manager_id: number;
 
   @BelongsTo(() => Manager)
-  manager: Manager;
+  declare manager: Manager;
 
   @Column({
-    type: DataType.STRING(10),
+    type: DataType.STRING(255),
     allowNull: false,
   })
-  password: string;
+  declare password: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  manager_code: string;
+  declare manager_code: string;
+
+  get name(): string {
+    return `${this.first_name} ${this.last_name}`;
+  }
 }

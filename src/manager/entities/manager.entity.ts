@@ -12,8 +12,8 @@ import {
   timestamps: false,
 })
 export class Manager extends Model {
-  @PrimaryKey // Mark as primary key
-  @AutoIncrement //incrementing ID
+  @PrimaryKey
+  @AutoIncrement
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -48,5 +48,5 @@ export class Manager extends Model {
     type: DataType.STRING(255),
     allowNull: false,
   })
-  password!: string;
+  declare password: string;
 }

@@ -2,13 +2,20 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
+interface JwtPayload {
+  sub: number;
+  email: string;
+  role: string;
+}
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     const secretkey = process.env.JWT_SECRET_KEY;
+
     if (!secretkey) {
-      throw new Error('Secret is not found');
+      throw new Error('Secret is not found in .env');
     }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -16,14 +23,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  validate(payload: JwtPayload): {
+    userId: number;
+    email: string;
+    role: string;
+  } {
+    console.log('🔓 Extracted Payload:', payload);
 
-  async validate(payload: any) {
-    console.log('🔓 Extracted Payload:', payload);  // ✅ Should contain { user_id: 1 }
-  
-    if (!payload.user_id) {
-      throw new UnauthorizedException('Invalid token: user_id missing');
+    if (!payload.sub) {
+      throw new UnauthorizedException('Invalid token: missing sub (userId)');
     }
-  
-    return { user_id: payload.user_id }; // ✅ This will be attached to `req.user`
+
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
   }
 }

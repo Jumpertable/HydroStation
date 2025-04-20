@@ -6,20 +6,19 @@ import { Manager } from 'src/manager/entities/manager.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     SequelizeModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY || 'default_secret',
+      secret: 'supersecret',
       signOptions: { expiresIn: '1d' },
     }),
     SequelizeModule.forFeature([Employee, Manager]),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, PassportModule],
 })
 export class AuthModule {}
