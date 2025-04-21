@@ -5,16 +5,10 @@ import { Manager } from './entities/manager.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
-import { JwtModule } from '@nestjs/jwt';
+import { Product } from 'src/product/entities/product.entity';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Manager, Employee]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY || 'supersecret',
-      signOptions: { expiresIn: '1d' },
-    }),
-  ],
+  imports: [SequelizeModule.forFeature([Manager, Employee, Product])],
   controllers: [ManagerController],
   providers: [ManagerService, EmployeeService],
   exports: [ManagerService],

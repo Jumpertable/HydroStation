@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EmployeeRegisterDto } from './dto/register.dto';
 import { Employee } from './entities/employee.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { genSalt, hash } from 'bcrypt';
 import { EmployeeLoginDto } from './dto/login.dto';
 import { UnauthorizedException } from '@nestjs/common';
 import { compare } from 'bcrypt';
@@ -13,16 +11,6 @@ export class EmployeeService {
     @InjectModel(Employee)
     private employeeModel: typeof Employee,
   ) {}
-
-  async create(employeeRegisterDto: EmployeeRegisterDto) {
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(employeeRegisterDto.password, salt);
-    const newEmployee = await this.employeeModel.create({
-      ...employeeRegisterDto,
-      password: hashedPassword,
-    });
-    return newEmployee;
-  }
 
   async findAll() {
     return await this.employeeModel.findAll({

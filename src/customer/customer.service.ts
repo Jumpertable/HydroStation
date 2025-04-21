@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Customer } from './entities/customer.entity';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { Order } from 'src/order/entities/order.entity';
 
 @Injectable()
 export class CustomerService {
@@ -21,8 +22,21 @@ export class CustomerService {
   async findOne(id: number): Promise<Customer> {
     const customer = await this.customerModel.findByPk(id);
     if (!customer) {
-      throw new Error(`Customer with ID ${id} not found`);
+      throw new NotFoundException(`Customer with ID ${id} not found`);
     }
+    return customer;
+  }
+
+  async getCustomerWithOrders(cusID: number) {
+    const customer = await this.customerModel.findOne({
+      where: { cusID },
+      include: [{ model: Order, required: false }],
+    });
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${cusID} not found`);
+    }
+
     return customer;
   }
 

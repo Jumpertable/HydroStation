@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { Product } from '../../product/entities/product.entity';
 import { Order } from 'src/order/entities/order.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @Table({ tableName: 'OrderItems' })
 export class OrderItem extends Model {
@@ -16,17 +17,30 @@ export class OrderItem extends Model {
 
   @ForeignKey(() => Order)
   @Column
-  declare orderID: number;
+  orderID: number;
 
   @BelongsTo(() => Order)
-  declare order: Order;
+  order: Order;
+
+  @ForeignKey(() => Customer)
+  @Column
+  cusID: number;
+
+  @Column(DataType.STRING)
+  cusName: string;
+
+  @BelongsTo(() => Customer)
+  customer: Customer;
 
   @ForeignKey(() => Product)
-  @Column
+  @Column({ type: DataType.INTEGER, allowNull: true })
   productID: number;
 
+  @Column(DataType.STRING)
+  productName: string;
+
   @BelongsTo(() => Product)
-  declare product: Product;
+  product: Product;
 
   @Column(DataType.INTEGER)
   amount: number;

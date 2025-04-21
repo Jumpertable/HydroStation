@@ -24,7 +24,7 @@ export class Customer extends Model {
     type: DataType.STRING(50),
     allowNull: false,
   })
-  cusName: string;
+  declare cusName: string;
 
   @Column({
     type: DataType.STRING(255),
@@ -41,4 +41,5 @@ export class Customer extends Model {
     type: DataType.STRING(255),
   })
   cusAddr: string;
+  static cusName: unknown;
 }

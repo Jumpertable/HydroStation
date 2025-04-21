@@ -8,6 +8,7 @@ import {
   HasMany,
 } from 'sequelize-typescript';
 import { InventoryAlert } from 'src/inv-alerts/entities/inv-alert.entity';
+import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 
 @Table({
   tableName: 'products',
@@ -31,6 +32,9 @@ export class Product extends Model<Product> {
   @HasMany(() => InventoryAlert)
   inventoryAlerts!: InventoryAlert[];
 
+  @HasMany(() => OrderItem)
+  orderItems: OrderItem[];
+
   @Column({
     type: DataType.FLOAT,
     allowNull: false,
@@ -43,8 +47,11 @@ export class Product extends Model<Product> {
   })
   declare productStock: number;
 
-  @Column(DataType.STRING)
-  productDes?: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  productDes: string;
 
   @Column({
     type: DataType.STRING,

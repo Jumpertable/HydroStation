@@ -48,12 +48,8 @@ export class OrderService {
     console.log('Final orderTotal:', orderTotal);
 
     //Create the order
-    const order = await this.orderModel.create({
-      cusID,
-      orderTotal,
-    } as any);
+    const order = await this.orderModel.create();
 
-    //Create each order item and update stock
     for (const item of items) {
       const product = productsMap.get(item.productID)!;
 
@@ -66,8 +62,6 @@ export class OrderService {
         amount: item.amount,
         productPrice: product.productPrice,
       });
-
-      product.productStock -= item.amount;
     }
 
     return order;

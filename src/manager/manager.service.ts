@@ -12,12 +12,16 @@ import { ManagerLoginDto } from './dto/login.dto';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { Employee } from 'src/employee/entities/employee.entity';
 import * as crypto from 'crypto';
+import { CreateProductDto } from 'src/product/dto/create-product.dto';
+import { Product } from 'src/product/entities/product.entity';
+import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 
 @Injectable()
 export class ManagerService {
   constructor(
     @InjectModel(Manager) private managerModel: typeof Manager,
     @InjectModel(Employee) private employeeModel: typeof Employee,
+    @InjectModel(Product) private productModel: typeof Product,
   ) {}
 
   async create(dto: ManagerRegisterDto) {
@@ -83,7 +87,9 @@ export class ManagerService {
   async createEmployee(dto: EmployeeRegisterDto, managerId: number) {
     const passcode = crypto.randomBytes(3).toString('hex');
 
-    const hashed = await hash(dto.password, 10);
+    const salt = await genSalt(10);
+    const hashed = await hash(dto.password, salt);
+
     const newEmp = await this.employeeModel.create({
       ...dto,
       manager_id: managerId,
@@ -123,7 +129,7 @@ export class ManagerService {
   }
 
   async getEmployeesUnderManager(manager_id: number) {
-    console.log('🔍 Checking for employees under manager ID:', manager_id);
+    console.log('Check for employees under manager ID:', manager_id);
     const employees = await this.employeeModel.findAll({
       where: { manager_id },
       attributes: { exclude: ['password', 'manager_code'] },
@@ -142,5 +148,29 @@ export class ManagerService {
     return {
       message: `Employee with ID ${employeeID} has been removed. Goodbye ${employee.first_name}`,
     };
+  }
+
+  //products
+
+  async addProduct(dto: CreateProductDto) {
+    return await this.productModel.create(dto as any);
+  }
+
+  async updateProduct(id: number, dto: UpdateProductDto) {
+    const product = await this.productModel.findByPk(id);
+    if (!product)
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    await product.update(dto);
+    return { message: 'Product updated successfully', product };
+  }
+
+  //obliterate product
+  async removeProduct(id: number) {
+    const product = await this.productModel.findByPk(id);
+    if (!product)
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    const name = product.productName;
+    await product.destroy();
+    return { message: `${name} with ID ${id} removed` };
   }
 }

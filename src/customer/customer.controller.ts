@@ -22,20 +22,20 @@ export class CustomerController {
     return this.customerService.create(customerData);
   }
 
-  //Get all cumtomers
+  //Get all customers
   @Get() //localhost:3100/customer
   findAll(): Promise<Customer[]> {
     return this.customerService.findAll();
   }
 
   //Get comtomers by ID
-  @Get(':id') //localhost:3100/customer/:id
-  async findOne(@Param('id') id: number): Promise<Customer> {
+  @Get(':cusID') //localhost:3100/customer/:cusID
+  async findOne(@Param('cusID') id: number) {
     return this.customerService.findOne(id);
   }
 
   //Update customer data
-  @Put('/update/:cusID') //localhost:3100/customer/update/:id
+  @Put('/update/:cusID') //localhost:3100/customer/update/:cusID
   async update(
     @Param('cusID', ParseIntPipe) cusID: number,
     @Body() updateData: UpdateCustomerDto,

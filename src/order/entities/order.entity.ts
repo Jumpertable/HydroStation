@@ -10,27 +10,22 @@ import {
   AutoIncrement,
   HasOne,
 } from 'sequelize-typescript';
-import {
-  InferAttributes,
-  InferCreationAttributes,
-  CreationOptional,
-} from 'sequelize';
 import { Customer } from '../../customer/entities/customer.entity';
 import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 
 @Table({ tableName: 'Orders', timestamps: true })
-export class Order extends Model<
-  InferAttributes<Order, { omit: 'customer' | 'orderItems' }>,
-  InferCreationAttributes<Order, { omit: 'customer' | 'orderItems' }>
-> {
+export class Order extends Model<Order> {
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.INTEGER })
-  declare orderID: CreationOptional<number>;
+  declare orderID: number;
 
-  @Column(DataType.FLOAT)
-  declare orderTotal: number;
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  declare orderTotal: number | null;
 
   @ForeignKey(() => Customer)
   @Column
@@ -44,4 +39,5 @@ export class Order extends Model<
 
   @HasOne(() => Payment)
   declare payment: Payment;
+  static orderID: unknown;
 }
