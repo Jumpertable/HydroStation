@@ -25,7 +25,9 @@ export class EmployeeService {
   }
 
   async findAll() {
-    return await this.employeeModel.findAll();
+    return await this.employeeModel.findAll({
+      attributes: { exclude: ['manager_code'] },
+    });
   }
 
   async findByManager(manager_id: number) {
@@ -42,28 +44,27 @@ export class EmployeeService {
   }
 
   async findOne(id: number) {
-    const employee = await this.employeeModel.findByPk(id);
+    const employee = await this.employeeModel.findByPk(id, {
+      attributes: {
+        exclude: ['manager_code'],
+      },
+    });
     if (!employee) {
       throw new NotFoundException(`Employee with id ${id} not found`);
     }
     return employee;
   }
 
-  async update(id: number, employeeRegisterDto: EmployeeRegisterDto) {
-    const employee = await this.findOne(id);
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(employeeRegisterDto.password, salt);
-    await employee.update({
-      ...employeeRegisterDto,
-      password: hashedPassword,
+  async getProfile(id: number) {
+    const employee = await this.employeeModel.findByPk(id, {
+      attributes: {
+        exclude: ['manager_code'],
+      },
     });
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
+    }
     return employee;
-  }
-
-  async remove(id: number) {
-    return await this.employeeModel.destroy({
-      where: { id: id },
-    });
   }
 
   async login(dto: EmployeeLoginDto) {
@@ -95,11 +96,5 @@ export class EmployeeService {
     };
   }
 
-  async getProfile(id: number) {
-    const employee = await this.employeeModel.findByPk(id);
-    if (!employee) {
-      throw new NotFoundException('Employee not found');
-    }
-    return employee;
-  }
+
 }

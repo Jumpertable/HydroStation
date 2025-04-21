@@ -15,16 +15,17 @@ export class Manager extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column({
+    field: 'manager_id',
     type: DataType.INTEGER,
     allowNull: false,
   })
-  declare id: number;
+  declare manager_id: number;
 
   @Column({
     type: DataType.STRING(50),
     allowNull: false,
   })
-  first_name!: string;
+  declare first_name: string;
 
   @Column({
     type: DataType.STRING(50),

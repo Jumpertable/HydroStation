@@ -7,18 +7,16 @@ import {
   Param,
   Delete,
   NotFoundException,
-  UseGuards,
-  Req,
 } from '@nestjs/common';
 import { ManagerService } from './manager.service';
 import { ManagerRegisterDto } from './dto/register.dto';
 import { ManagerLoginDto } from './dto/login.dto';
-import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { EmployeeService } from 'src/employee/employee.service';
 
 @Controller('manager')
 export class ManagerController {
+  employeeModel: any;
   constructor(
     private readonly managerService: ManagerService,
     private readonly employeeService: EmployeeService,
@@ -54,20 +52,34 @@ export class ManagerController {
 
   @Delete('/delete/:id') //localhost:3100/manager/delete/:id
   async remove(@Param('id') id: string) {
-    const destroyManager = await this.managerService.remove(+id);
-    console.log(destroyManager);
-    if (destroyManager == 0) {
-      throw new NotFoundException('Manager not missing!!');
+    const manager = await this.managerService.findOne(+id); //fetches manager
+
+    const destroyed = await this.managerService.remove(+id);
+
+    if (destroyed === 0) {
+      throw new NotFoundException('Manager missing!!');
     }
-    return { message: `Manager with id ${id} has been removed` };
+
+    return {
+      message: `Manager ${manager.first_name} with id ${id} has been removed`,
+    };
   }
 
+  //employeee
+
   @Post(':id/create-employee')
-  createEmployee(
-    @Body() dto: EmployeeRegisterDto,
-    @Body('manager_id') managerID: number,
-  ) {
-    return this.managerService.createEmployee(dto, managerID);
+  createEmployee(@Body() dto: EmployeeRegisterDto) {
+    return this.managerService.createEmployee(dto, dto.manager_id);
+  }
+
+  @Patch('update-employee/:id')
+  updateEmployee(@Param('id') id: string, @Body() dto: EmployeeRegisterDto) {
+    return this.managerService.updateEmployee(+id, dto);
+  }
+
+  @Get(':id/employees')
+  async getEmployeesUnderManager(@Param('id') id: string) {
+    return this.managerService.getEmployeesUnderManager(+id);
   }
 
   @Delete('remove-employee/:id')

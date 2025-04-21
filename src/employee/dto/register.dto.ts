@@ -13,4 +13,7 @@ export class EmployeeRegisterDto {
 
   @IsNotEmpty({ message: 'password required!!' })
   password: string;
+
+  @IsNotEmpty({ message: 'Who do you belong to?!!' })
+  manager_id: number;
 }

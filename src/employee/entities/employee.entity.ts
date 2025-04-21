@@ -49,6 +49,7 @@ export class Employee extends Model {
   @ForeignKey(() => Manager)
   @Column({
     type: DataType.INTEGER,
+    allowNull: false,
   })
   declare manager_id: number;
 

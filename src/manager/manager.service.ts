@@ -45,7 +45,7 @@ export class ManagerService {
 
     return {
       message: 'Login successful',
-      managerID: manager.id,
+      managerID: manager.manager_id,
       email: manager.businessEmail,
     };
   }
@@ -54,16 +54,16 @@ export class ManagerService {
     return await this.managerModel.findAll();
   }
 
-  async findOne(id: number) {
-    const manager = await this.managerModel.findByPk(id);
+  async findOne(manager_id: number) {
+    const manager = await this.managerModel.findByPk(manager_id);
     if (!manager) {
-      throw new BadRequestException(`Manager with id ${id} not found`);
+      throw new BadRequestException(`Manager with id ${manager_id} not found`);
     }
     return manager;
   }
 
-  async update(id: number, dto: ManagerRegisterDto) {
-    const manager = await this.findOne(id);
+  async update(manager_id: number, dto: ManagerRegisterDto) {
+    const manager = await this.findOne(manager_id);
 
     const salt = await genSalt(10);
     const hashed = await hash(dto.password, salt);
@@ -74,8 +74,8 @@ export class ManagerService {
     });
   }
 
-  async remove(id: number) {
-    return await this.managerModel.destroy({ where: { id } });
+  async remove(manager_id: number) {
+    return await this.managerModel.destroy({ where: { id: manager_id } });
   }
 
   //employees
@@ -99,6 +99,39 @@ export class ManagerService {
     };
   }
 
+  async updateEmployee(
+    id: number,
+    dto: EmployeeRegisterDto,
+  ): Promise<{ message: string; employeeID: any }> {
+    const employee = await this.employeeModel.findByPk(id);
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
+    }
+
+    const updateData = { ...dto };
+
+    if (dto.password) {
+      updateData.password = await hash(dto.password, 10);
+    }
+
+    await employee.update(updateData);
+
+    return {
+      message: 'Employee updated successfully',
+      employeeID: employee.employeeID,
+    };
+  }
+
+  async getEmployeesUnderManager(manager_id: number) {
+    console.log('🔍 Checking for employees under manager ID:', manager_id);
+    const employees = await this.employeeModel.findAll({
+      where: { manager_id },
+      attributes: { exclude: ['password', 'manager_code'] },
+    });
+    console.log('🧾 Found employees:', employees);
+    return employees;
+  }
+
   async removeEmployee(employeeID: number): Promise<{ message: string }> {
     const employee = await this.employeeModel.findByPk(employeeID);
     if (!employee) {
@@ -106,6 +139,8 @@ export class ManagerService {
     }
 
     await employee.destroy();
-    return { message: `Employee with ID ${employeeID} has been removed.` };
+    return {
+      message: `Employee with ID ${employeeID} has been removed. Goodbye ${employee.first_name}`,
+    };
   }
 }
