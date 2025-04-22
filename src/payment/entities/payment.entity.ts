@@ -2,45 +2,38 @@ import {
   Table,
   Column,
   Model,
-  ForeignKey,
-  DataType,
   PrimaryKey,
   AutoIncrement,
-  BelongsTo,
+  DataType,
+  HasMany,
 } from 'sequelize-typescript';
 import { Order } from 'src/order/entities/order.entity';
 
 @Table({ tableName: 'Payments', timestamps: true })
-export class Payment extends Model {
+export class Payment extends Model<Payment> {
   @PrimaryKey
   @AutoIncrement
-  @Column({
-    type: DataType.INTEGER,
-  })
+  @Column(DataType.INTEGER)
   declare payID: number;
 
-  @ForeignKey(() => Order)
-  @Column({
-    type: DataType.INTEGER,
-  })
-  declare orderID: number;
+  @Column(DataType.INTEGER)
+  declare cusID: number;
 
-  @BelongsTo(() => Order)
-  declare order: Order;
+  @Column(DataType.FLOAT)
+  payAmount: number;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare payMethod: string;
+  @Column(DataType.STRING)
+  payMethod: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare payTrans?: string;
+  @Column(DataType.STRING)
+  payTrans: string;
 
-  @Column({
-    type: DataType.FLOAT,
+  @Column(DataType.STRING)
+  payStatus: string;
+
+  @HasMany(() => Order, {
+    onDelete: 'SET NULL', // prevents constraint error when deleting orders
+    foreignKey: 'payID',
   })
-  declare amount: number;
+  orders: Order[];
 }

@@ -8,9 +8,8 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
-  HasOne,
 } from 'sequelize-typescript';
-import { Customer } from '../../customer/entities/customer.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 
@@ -21,11 +20,8 @@ export class Order extends Model<Order> {
   @Column({ type: DataType.INTEGER })
   declare orderID: number;
 
-  @Column({
-    type: DataType.FLOAT,
-    allowNull: false,
-  })
-  declare orderTotal: number | null;
+  @Column({ type: DataType.FLOAT, allowNull: false })
+  declare orderTotal: number;
 
   @ForeignKey(() => Customer)
   @Column
@@ -37,7 +33,10 @@ export class Order extends Model<Order> {
   @HasMany(() => OrderItem, { as: 'orderItems' })
   declare orderItems: OrderItem[];
 
-  @HasOne(() => Payment)
+  @ForeignKey(() => Payment)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  declare payID: number;
+
+  @BelongsTo(() => Payment, { onDelete: 'SET NULL' })
   declare payment: Payment;
-  static orderID: unknown;
 }

@@ -5,7 +5,6 @@ import { Order } from 'src/order/entities/order.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { UpdateOrderitemDto } from './dto/update-orderitem.dto';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class OrderItemsService {
@@ -17,10 +16,9 @@ export class OrderItemsService {
     @InjectModel(Product)
     private readonly productModel: typeof Product,
     @InjectModel(Customer)
-    private readonly customerModel: typeof Customer, // Inject Customer model
+    private readonly customerModel: typeof Customer,
   ) {}
 
-  // Create a new Order Item
   async create(createOrderItemDto: any) {
     const { cusID, productID, amount } = createOrderItemDto;
 
@@ -39,26 +37,19 @@ export class OrderItemsService {
     let order = await this.orderModel.findOne({
       where: {
         cusID,
-        orderTotal: {
-          [Op.is]: null, // explicitly using Op.is to handle null
-        },
+        orderTotal: null,
       },
-    });
+    }as any);
 
     if (!order) {
-      // If no order exists, create a new one
       order = await this.orderModel.create({
         cusID,
         orderTotal: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any); // Cast to `any` to bypass type checking
+      }as any);
     }
 
-    // Calculate the total price for the order item
     const orderItemTotal = product.productPrice * amount;
 
-    // Create the order item
     const orderItem = await this.orderItemsModel.create({
       orderID: order.orderID,
       productID,
@@ -69,52 +60,32 @@ export class OrderItemsService {
       cusName: customer.cusName,
     });
 
-    console.log(
-      `Current Total for Order ${order.orderID}: ${order.orderTotal}`,
-    );
-    console.log(`Adding orderItemTotal: ${orderItemTotal}`);
-
-    // Update the order total with the new item total
     await this.updateOrderTotal(order.orderID, orderItemTotal);
 
-    // Reduce product stock
     product.productStock -= amount;
     await product.save();
 
     return orderItem;
   }
 
-  // Update the order total after adding an order item
   private async updateOrderTotal(orderID: number, orderItemTotal: number) {
     const order = await this.orderModel.findByPk(orderID);
-
     if (order) {
       const currentTotal = order.orderTotal || 0;
       order.orderTotal = currentTotal + orderItemTotal;
-
       await order.save();
     }
   }
 
-  // Find all Order Items
   async findAll() {
     return this.orderItemsModel.findAll({
       include: [
-        {
-          model: Product,
-          required: true,
-          attributes: ['productName'],
-        },
-        {
-          model: Customer,
-          required: true,
-          attributes: ['cusName'],
-        },
+        { model: Product, required: true, attributes: ['productName'] },
+        { model: Customer, required: true, attributes: ['cusName'] },
       ],
     });
   }
 
-  // Find one Order Item by ID
   async findOne(id: number) {
     const orderItem = await this.orderItemsModel.findByPk(id, {
       include: [Order, Product, Customer],
@@ -125,7 +96,6 @@ export class OrderItemsService {
     return orderItem;
   }
 
-  // Find Order Items by Order ID
   async findByOrder(orderID: number) {
     const orderItems = await this.orderItemsModel.findAll({
       where: { orderID },
@@ -141,7 +111,6 @@ export class OrderItemsService {
     return orderItems;
   }
 
-  // Update an Order Item
   async update(id: number, dto: UpdateOrderitemDto) {
     const orderItem = await this.orderItemsModel.findByPk(id);
     if (!orderItem) {
