@@ -3,5 +3,5 @@ export class CreatePaymentDto {
   orderID: number;
   payMethod: string;
   payTrans: string;
-  payAmount: number;
+  amount: number;
 }

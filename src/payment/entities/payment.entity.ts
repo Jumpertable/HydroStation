@@ -20,7 +20,7 @@ export class Payment extends Model<Payment> {
   declare cusID: number;
 
   @Column(DataType.FLOAT)
-  payAmount: number;
+  amount: number;
 
   @Column(DataType.STRING)
   payMethod: string;

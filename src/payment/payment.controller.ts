@@ -12,7 +12,7 @@ export class PaymentController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.paymentService.findAll();
   }
 
