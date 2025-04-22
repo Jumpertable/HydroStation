@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './entities/product.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductService {
@@ -13,7 +14,7 @@ export class ProductService {
     return this.productModel.findAll();
   }
 
-  async findOne(identifier: number | string): Promise<Product> {
+  async findOne(identifier: number | string): Promise<any> {
     let product: Product | null;
 
     if (typeof identifier === 'number') {
@@ -23,13 +24,43 @@ export class ProductService {
       }
     } else {
       product = await this.productModel.findOne({
-        where: { productName: identifier },
+        where: {
+          productName: {
+            [Op.iLike]: identifier,
+          },
+        },
       });
       if (!product) {
         throw new Error(`Where's my "${identifier}"?!?`);
       }
     }
 
-    return product;
+    return {
+      productID: product.productID,
+      productName: product.productName,
+      productStock: product.productStock,
+      stockStatus:
+        product.productStock <= 50
+          ? 'Low'
+          : product.productStock <= 100
+            ? 'Warning'
+            : 'Sufficient',
+    };
+  }
+
+  async getStockLevels(): Promise<any[]> {
+    const products = await this.productModel.findAll({
+      attributes: ['productID', 'productName', 'productStock'],
+    });
+
+    return products.map((product) => ({
+      ...product.get(),
+      stockStatus:
+        product.productStock <= 50
+          ? 'Low'
+          : product.productStock <= 100
+            ? 'Warning'
+            : 'Sufficient',
+    }));
   }
 }
