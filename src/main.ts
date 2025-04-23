@@ -16,8 +16,13 @@ async function bootstrap() {
   const sequelize = app.get(Sequelize);
   await sequelize.sync({ alter: true });
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:3100',
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3100);
+
+  console.log('App is running on: http://localhost:3100');
 }
 bootstrap();

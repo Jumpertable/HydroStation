@@ -12,7 +12,7 @@ import { PassportModule } from '@nestjs/passport';
     SequelizeModule,
     PassportModule,
     JwtModule.register({
-      secret: 'supersecret',
+      secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '1d' },
     }),
     SequelizeModule.forFeature([Employee, Manager]),

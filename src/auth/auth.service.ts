@@ -84,34 +84,38 @@ export class AuthService {
 
   //Manager Login
 
-  async login(managerLoginDto: ManagerLoginDto) {
-    console.log('📥 Received Login Request:', managerLoginDto);
+  async loginManager(managerLoginDto: ManagerLoginDto) {
+    console.log(
+      '📥 Received login request for:',
+      managerLoginDto.businessEmail,
+    );
+    try {
+      const manager = await this.managerModel.findOne({
+        where: { businessEmail: managerLoginDto.businessEmail },
+      });
+      if (!manager) {
+        throw new UnauthorizedException(
+          'This email does not exist. Please try again.',
+        );
+      }
 
-    const manager = await this.managerModel.findOne({
-      where: { businessEmail: managerLoginDto.businessEmail },
-      attributes: ['id', 'businessEmail', 'password'],
-      raw: true,
-    });
+      const isValid = await compare(managerLoginDto.password, manager.password);
+      if (!isValid) {
+        throw new UnauthorizedException('Incorrect password');
+      }
 
-    if (!manager || !manager.id) {
-      console.error('❌ Manager not found or ID missing');
-      throw new UnauthorizedException('WHERE IS THE MANAGER!?!');
+      const payload = { user_manager_id: manager.manager_id };
+      const token = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET_KEY,
+      });
+
+      return { access_token: token };
+    } catch (err) {
+      console.error('🔥 Error during login:', err);
+      throw new UnauthorizedException(
+        'Login failed — check credentials or configuration',
+      );
     }
-
-    const isValid = await compare(managerLoginDto.password, manager.password);
-    if (!isValid) {
-      console.error('❌ Incorrect password');
-      throw new UnauthorizedException('INCORRECT PASSWORD!!!');
-    }
-
-    const payload = { user_id: manager.id };
-    console.log('📝 Signing JWT with payload:', payload);
-    const token = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_SECRET_KEY || 'default_secret_key',
-    });
-    console.log('🔑 Generated Token:', token);
-
-    return { access_token: token };
   }
 
   async getManagerProfile(id: number) {

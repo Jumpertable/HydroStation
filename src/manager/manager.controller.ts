@@ -11,31 +11,14 @@ import {
 } from '@nestjs/common';
 import { ManagerService } from './manager.service';
 import { ManagerRegisterDto } from './dto/register.dto';
-import { ManagerLoginDto } from './dto/login.dto';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
-import { EmployeeService } from 'src/employee/employee.service';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 
 @Controller('manager')
 export class ManagerController {
   employeeModel: any;
-  constructor(
-    private readonly managerService: ManagerService,
-    private readonly employeeService: EmployeeService,
-  ) {}
-
-  //first_name, last_name, businessEmail, companyAddress, password
-  @Post('/regist')
-  create(@Body() managerRegisterDto: ManagerRegisterDto) {
-    return this.managerService.create(managerRegisterDto);
-  }
-
-  //businessEmail, password
-  @Post('login')
-  async login(@Body() dto: ManagerLoginDto) {
-    return this.managerService.login(dto);
-  }
+  constructor(private readonly managerService: ManagerService) {}
 
   //employeee
 

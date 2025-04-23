@@ -17,10 +17,10 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('employee/login') //localhost:3100/auth/employee/login
+  @Post('employee/regist') //localhost:3100/auth/employee/regist
   @HttpCode(201)
   async loginEmployee(@Body() employeeLoginDto: EmployeeLoginDto) {
-    await this.authService.loginEmployee(employeeLoginDto);
+    await this.authService.loginEmployee(employeeLoginDto); // Correct service method
     return {
       message: 'Employee Registration Complete!',
     };
@@ -34,7 +34,7 @@ export class AuthController {
   //"companyAddress": "non",
   //"password": "r"
 
-  @Post('/manager/regist') //localhost:3100/auth/manager/regist
+  @Post('manager/regist') //localhost:3100/auth/manager/regist
   @HttpCode(201)
   async registerManager(@Body() managerRegisterDto: ManagerRegisterDto) {
     await this.authService.registerManager(managerRegisterDto); // Correct service method
@@ -46,10 +46,11 @@ export class AuthController {
   //"businessEmail": "r",
   //"password": "r"
 
-  @Post('/manager/login') //localhost:3100/auth/manager/login
+  @Post('manager/login') //localhost:3100/auth/manager/login
   @HttpCode(201)
-  async login(@Body() managerLoginDto: ManagerLoginDto) {
-    return this.authService.login(managerLoginDto);
+  async loginManager(@Body() managerLoginDto: ManagerLoginDto) {
+    console.log('Received login request:', managerLoginDto); 
+    return this.authService.loginManager(managerLoginDto);
   }
 
   //Only manager
