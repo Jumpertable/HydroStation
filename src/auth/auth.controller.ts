@@ -9,19 +9,18 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
-// import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
+import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
 import { ManagerLoginDto } from 'src/manager/dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('employee/regist') //localhost:3100/auth/employee/regist
+  @Post('employee/login') //localhost:3100/auth/employee/login
   @HttpCode(201)
-  async registerEmployee(@Body() employeeRegisterDto: EmployeeRegisterDto) {
-    await this.authService.registerEmployee(employeeRegisterDto); // Correct service method
+  async loginEmployee(@Body() employeeLoginDto: EmployeeLoginDto) {
+    await this.authService.loginEmployee(employeeLoginDto);
     return {
       message: 'Employee Registration Complete!',
     };

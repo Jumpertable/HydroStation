@@ -6,9 +6,8 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Manager } from 'src/manager/entities/manager.entity';
-import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { ManagerRegisterDto } from 'src/manager/dto/register.dto';
-//import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
+import { EmployeeLoginDto } from 'src/employee/dto/login.dto';
 import { ManagerLoginDto } from 'src/manager/dto/login.dto';
 import { hash, genSalt, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -26,29 +25,34 @@ export class AuthService {
   ) {}
 
   //Employee
-
-  async registerEmployee(employeeRegisterDto: EmployeeRegisterDto) {
+  async loginEmployee(employeeLoginDto: EmployeeLoginDto) {
     const employee = await this.employeeModel.findOne({
-      where: { businessEmail: employeeRegisterDto.businessEmail },
+      where: { businessEmail: employeeLoginDto.businessEmail },
+      attributes: ['employeeID', 'password', 'manager_code'],
+      raw: true,
     });
 
-    if (employee) {
-      throw new BadRequestException(
-        'This email already exists. Please try again.',
-      );
+    if (!employee || !employee.employeeID) {
+      throw new UnauthorizedException('Employee not found');
     }
 
-    const salt = await genSalt(10);
-    const hashPassword = await hash(employeeRegisterDto.password, salt);
+    const isValid = await compare(employeeLoginDto.password, employee.password);
+    if (!isValid) {
+      throw new UnauthorizedException('Incorrect password');
+    }
 
-    const newEmp = await this.employeeModel.create({
-      first_name: employeeRegisterDto.first_name,
-      last_name: employeeRegisterDto.last_name,
-      businessEmail: employeeRegisterDto.businessEmail,
-      password: hashPassword,
+    const payload = { employee_id: employee.employeeID };
+    const token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET_KEY || 'default_secret_key',
     });
 
-    return newEmp;
+    return { access_token: token };
+  }
+
+  async getEmployeeProfile(id: number) {
+    return await this.employeeModel.findByPk(id, {
+      attributes: ['employeeID', 'first_name', 'last_name', 'businessEmail'],
+    });
   }
 
   //Manager Registration

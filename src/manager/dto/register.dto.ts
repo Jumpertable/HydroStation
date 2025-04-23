@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class ManagerRegisterDto {
   @IsNotEmpty({ message: 'first name required!!' })
@@ -8,12 +8,10 @@ export class ManagerRegisterDto {
   last_name: string;
 
   @IsNotEmpty({ message: 'business email required!!' })
-  @MaxLength(255)
   @IsEmail({}, { message: 'The email format is incorrect.' })
   businessEmail: string;
 
   @IsString()
-  @MaxLength(255) // Adjust as needed
   companyAddress: string;
 
   @IsNotEmpty({ message: 'password required!!' })

@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { Sequelize } from 'sequelize-typescript'; 
+import { Sequelize } from 'sequelize-typescript';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,6 +16,8 @@ async function bootstrap() {
   const sequelize = app.get(Sequelize);
   await sequelize.sync({ alter: true });
 
-  await app.listen(3100);
+  app.enableCors();
+
+  await app.listen(process.env.PORT ?? 3100);
 }
 bootstrap();

@@ -31,17 +31,57 @@ export class ManagerService {
     @InjectModel(OrderItem) private orderItemModel: typeof OrderItem,
   ) {}
 
-  async create(dto: ManagerRegisterDto) {
+  async create(managerRegisterDto: ManagerRegisterDto) {
+    // Validate password before hashing (ensure it's not empty or invalid)
+    if (
+      !managerRegisterDto.password ||
+      managerRegisterDto.password.length < 6
+    ) {
+      throw new BadRequestException(
+        'Password is required and must be at least 6 characters long',
+      );
+    }
+
+    // Validate other fields
+    if (!managerRegisterDto.first_name || !managerRegisterDto.last_name) {
+      throw new BadRequestException('First name and Last name are required');
+    }
+
+    // Hash the password
     const salt = await genSalt(10);
-    const hashed = await hash(dto.password, salt);
+    const hashedPassword = await hash(managerRegisterDto.password, salt);
 
     try {
-      return await this.managerModel.create({ ...dto, password: hashed });
+      // Create the manager record
+      const manager = await this.managerModel.create({
+        ...managerRegisterDto,
+        password: hashedPassword, // Use the hashed password
+      });
+
+      // Return relevant manager data, omitting sensitive fields like password
+      return {
+        message: 'Manager successfully registered',
+        manager_id: manager.manager_id,
+        first_name: manager.first_name,
+        last_name: manager.last_name,
+        businessEmail: manager.businessEmail,
+        companyAddress: manager.companyAddress,
+      };
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error.message);
+      // Handle errors more specifically
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        // If email is already registered, handle it specifically
+        console.error('Email already exists:', error.message);
+        throw new BadRequestException('Email already registered');
       }
-      throw new BadRequestException('Email already registered');
+
+      // General error handling if it's not a unique constraint issue
+      console.error(
+        'Error during manager creation:',
+        error.message,
+        error.stack,
+      );
+      throw new BadRequestException('Failed to register manager');
     }
   }
 

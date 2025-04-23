@@ -37,6 +37,18 @@ export class Manager extends Model {
     type: DataType.STRING(255),
     allowNull: false,
     unique: true,
+    set(value: string) {
+      this.setDataValue('businessEmail', value.trim());
+    },
+    validate: {
+      isEmail: {
+        msg: 'The email format is incorrect.',
+      },
+      len: {
+        args: [0, 255],
+        msg: 'Email must be shorter than or equal to 255 characters.',
+      },
+    },
   })
   businessEmail!: string;
 

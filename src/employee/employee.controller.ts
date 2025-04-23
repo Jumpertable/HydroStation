@@ -6,7 +6,7 @@ import { EmployeeLoginDto } from './dto/login.dto';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @Post('login')
+  @Post('login') //localhost:3100/employee/login
   login(@Body() dto: EmployeeLoginDto) {
     return this.employeeService.login(dto);
   }
