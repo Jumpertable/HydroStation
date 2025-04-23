@@ -12,6 +12,7 @@ import {
 import { Customer } from 'src/customer/entities/customer.entity';
 import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Table({ tableName: 'Orders', timestamps: true })
 export class Order extends Model<Order> {
@@ -21,7 +22,7 @@ export class Order extends Model<Order> {
   declare orderID: number;
 
   @Column({ type: DataType.FLOAT, allowNull: false })
-  declare orderTotal: number;
+  declare orderTotal: number | null;
 
   @ForeignKey(() => Customer)
   @Column
@@ -35,8 +36,15 @@ export class Order extends Model<Order> {
 
   @ForeignKey(() => Payment)
   @Column({ type: DataType.INTEGER, allowNull: true })
-  declare payID: number;
+  declare payID: number | null;
 
   @BelongsTo(() => Payment, { onDelete: 'SET NULL' })
   declare payment: Payment;
+
+  @ForeignKey(() => Product)
+  @Column
+  productID: number;
+
+  @BelongsTo(() => Product)
+  product: Product;
 }

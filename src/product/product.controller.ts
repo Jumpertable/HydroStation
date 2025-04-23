@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 
@@ -6,7 +6,7 @@ import { Product } from './entities/product.entity';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  // Get all product stock levels first (avoids route conflict)
+  // product stock
   @Get('stock') // localhost:3100/product/stock
   async getProductStockLevels(): Promise<any[]> {
     return this.productService.getStockLevels();
@@ -23,5 +23,13 @@ export class ProductController {
   async findOne(@Param('identifier') identifier: string): Promise<Product> {
     const parsedId = parseInt(identifier, 10);
     return this.productService.findOne(isNaN(parsedId) ? identifier : parsedId);
+  }
+
+  @Patch(':id')
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() dto: Partial<Product>, // or UpdateProductDto
+  ) {
+    return this.productService.updateProduct(+id, dto);
   }
 }

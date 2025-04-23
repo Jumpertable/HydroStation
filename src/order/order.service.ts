@@ -5,6 +5,7 @@ import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Payment } from 'src/payment/entities/payment.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @Injectable()
 export class OrderService {
@@ -83,13 +84,22 @@ export class OrderService {
       ],
     });
 
-    // ✅ Transform and add "paymentStatus"
     return orders.map((order) => {
       const plain = order.get({ plain: true });
       return {
         ...plain,
         paymentStatus: plain.payment ? 'Paid' : 'Unpaid',
       };
+    });
+  }
+
+  async findAllOrdersWithDetails(): Promise<Order[]> {
+    return this.orderModel.findAll({
+      include: [
+        { model: Customer },
+        { model: OrderItem, include: [Product] },
+        { model: Payment },
+      ],
     });
   }
 }

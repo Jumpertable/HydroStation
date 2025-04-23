@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './entities/product.entity';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductService {
@@ -25,9 +24,7 @@ export class ProductService {
     } else {
       product = await this.productModel.findOne({
         where: {
-          productName: {
-            [Op.iLike]: identifier,
-          },
+          productName: identifier,
         },
       });
       if (!product) {
@@ -39,28 +36,79 @@ export class ProductService {
       productID: product.productID,
       productName: product.productName,
       productStock: product.productStock,
+      stockLimit: product.stockLimit,
       stockStatus:
-        product.productStock <= 50
-          ? 'Low'
-          : product.productStock <= 100
-            ? 'Warning'
-            : 'Sufficient',
+        product.stockLimit !== null && product.stockLimit !== undefined
+          ? product.productStock <= product.stockLimit
+            ? 'Low'
+            : 'Sufficient'
+          : product.productStock <= 50
+            ? 'Low'
+            : product.productStock <= 100
+              ? 'Warning'
+              : 'Sufficient',
     };
   }
 
   async getStockLevels(): Promise<any[]> {
     const products = await this.productModel.findAll({
-      attributes: ['productID', 'productName', 'productStock'],
+      attributes: ['productID', 'productName', 'productStock', 'stockLimit'],
     });
 
-    return products.map((product) => ({
-      ...product.get(),
-      stockStatus:
-        product.productStock <= 50
+    return products.map((product) => {
+      const stockStatus =
+        product.stockLimit !== null && product.stockLimit !== undefined
+          ? product.productStock <= product.stockLimit
+            ? 'Low'
+            : 'Sufficient'
+          : product.productStock <= 50
+            ? 'Low'
+            : product.productStock <= 100
+              ? 'Warning'
+              : 'Sufficient';
+
+      return {
+        productID: product.productID,
+        productName: product.productName,
+        productStock: product.productStock,
+        stockLimit: product.stockLimit,
+        stockStatus,
+      };
+    });
+  }
+
+  async updateProduct(id: number, dto: Partial<Product>) {
+    const product = await this.productModel.findByPk(id);
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    // Update the product
+    await product.update(dto);
+
+    // Refresh product to updated
+    await product.reload();
+
+    const stockStatus =
+      product.stockLimit !== null && product.stockLimit !== undefined
+        ? product.productStock <= product.stockLimit
+          ? 'Low'
+          : 'Sufficient'
+        : product.productStock <= 50
           ? 'Low'
           : product.productStock <= 100
             ? 'Warning'
-            : 'Sufficient',
-    }));
+            : 'Sufficient';
+
+    return {
+      message: 'Product updated successfully',
+      product: {
+        productID: product.productID,
+        productName: product.productName,
+        productStock: product.productStock,
+        stockStatus,
+        stockLimit: product.stockLimit,
+      },
+    };
   }
 }

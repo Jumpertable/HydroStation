@@ -5,9 +5,13 @@ import { OrderItem } from 'src/orderitem/entities/orderitem.entity';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { Product } from '../product/entities/product.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Order, OrderItem, Product])],
+  imports: [
+    SequelizeModule.forFeature([Order, OrderItem, Product, Payment, Customer]),
+  ],
   providers: [OrderService],
   controllers: [OrderController],
 })

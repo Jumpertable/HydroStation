@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ManagerService } from './manager.service';
 import { ManagerRegisterDto } from './dto/register.dto';
@@ -34,40 +35,6 @@ export class ManagerController {
   @Post('login')
   async login(@Body() dto: ManagerLoginDto) {
     return this.managerService.login(dto);
-  }
-
-  @Get()
-  async findAll() {
-    return await this.managerService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.managerService.findOne(+id);
-  }
-
-  //first_name, last_name, businessEmail, companyAddress, password
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() managerRegisterDto: ManagerRegisterDto,
-  ) {
-    return await this.managerService.update(+id, managerRegisterDto);
-  }
-
-  @Delete('/delete/:id') //localhost:3100/manager/delete/:id
-  async remove(@Param('id') id: string) {
-    const manager = await this.managerService.findOne(+id); //fetches manager
-
-    const destroyed = await this.managerService.remove(+id);
-
-    if (destroyed === 0) {
-      throw new NotFoundException('Manager missing!!');
-    }
-
-    return {
-      message: `Manager ${manager.first_name} with id ${id} has been removed`,
-    };
   }
 
   //employeee
@@ -102,7 +69,7 @@ export class ManagerController {
     return this.managerService.addProduct(dto);
   }
 
-  //productName, productDes, productPrice, productStock, productBrand
+  //productName, productDes O, productPrice O, productStock O, productBrand O, stockLimit O
   @Patch('update-product/:id')
   updateProduct(@Param('id') id: number, @Body() dto: UpdateProductDto) {
     return this.managerService.updateProduct(+id, dto);
@@ -111,5 +78,65 @@ export class ManagerController {
   @Delete('remove-product/:id')
   removeProduct(@Param('id') id: number) {
     return this.managerService.removeProduct(+id);
+  }
+
+  //order
+
+  @Get('view-all-orders')
+  async viewAllCustomerOrders() {
+    return this.managerService.viewAllCustomerOrders();
+  }
+
+  @Patch('cancel-order/:id')
+  cancelOrder(@Param('id') id: number) {
+    return this.managerService.cancelOrder(id);
+  }
+
+  //orderitem
+
+  @Get(['high-demand-items', 'high-demand-items/:limit'])
+  getHighDemandItems(@Param('limit') limit?: string) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 5;
+    return this.managerService.getHighDemandItems(parsedLimit);
+  }
+
+  //manager
+
+  @Get()
+  async findAll() {
+    return await this.managerService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Invalid manager ID');
+    }
+    return this.managerService.findOne(parsedId);
+  }
+
+  //first_name, last_name, businessEmail, companyAddress, password
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() managerRegisterDto: ManagerRegisterDto,
+  ) {
+    return await this.managerService.update(+id, managerRegisterDto);
+  }
+
+  @Delete('/delete/:id') //localhost:3100/manager/delete/:id
+  async remove(@Param('id') id: string) {
+    const manager = await this.managerService.findOne(+id); //fetches manager
+
+    const destroyed = await this.managerService.remove(+id);
+
+    if (destroyed === 0) {
+      throw new NotFoundException('Manager missing!!');
+    }
+
+    return {
+      message: `Manager ${manager.first_name} with id ${id} has been removed`,
+    };
   }
 }

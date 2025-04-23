@@ -53,6 +53,8 @@ import { Payment } from './payment/entities/payment.entity';
       Customer,
       Product,
       InventoryAlert,
+      Order,
+      OrderItem,
     ]),
     EmployeeModule,
     ManagerModule,

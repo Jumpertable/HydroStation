@@ -48,6 +48,12 @@ export class Product extends Model<Product> {
   declare productStock: number;
 
   @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare stockLimit: number;
+
+  @Column({
     type: DataType.STRING,
     allowNull: true,
   })
