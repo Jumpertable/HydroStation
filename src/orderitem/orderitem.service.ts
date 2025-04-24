@@ -39,13 +39,15 @@ export class OrderItemsService {
         cusID,
         orderTotal: null,
       },
-    }as any);
+    });
 
     if (!order) {
-      order = await this.orderModel.create({
+      const newOrder = this.orderModel.build({
         cusID,
-        orderTotal: 0,
-      }as any);
+        orderTotal: null,
+      } as any);
+      await newOrder.save();
+      order = newOrder;
     }
 
     const orderItemTotal = product.productPrice * amount;
@@ -85,8 +87,6 @@ export class OrderItemsService {
       ],
     });
   }
-
-  
 
   async findOne(id: number) {
     const orderItem = await this.orderItemsModel.findByPk(id, {
