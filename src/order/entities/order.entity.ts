@@ -21,7 +21,7 @@ export class Order extends Model<Order> {
   @Column({ type: DataType.INTEGER })
   declare orderID: number;
 
-  @Column({ type: DataType.FLOAT, allowNull: false })
+  @Column({ type: DataType.FLOAT, allowNull: true })
   declare orderTotal: number | null;
 
   @ForeignKey(() => Customer)

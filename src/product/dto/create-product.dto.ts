@@ -18,4 +18,7 @@ export class CreateProductDto {
 
   @IsString()
   productBrand: string;
+
+  @IsString()
+  image_url: string;
 }

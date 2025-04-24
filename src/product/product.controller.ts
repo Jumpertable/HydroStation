@@ -13,10 +13,6 @@ export class ProductController {
   }
 
   // Get all products
-  @Get() // localhost:3100/product
-  async findAll(): Promise<Product[]> {
-    return this.productService.findAll();
-  }
 
   // Get product by ID or Name
   @Get(':identifier') // localhost:3100/product/:identifier
@@ -31,5 +27,10 @@ export class ProductController {
     @Body() dto: Partial<Product>, // or UpdateProductDto
   ) {
     return this.productService.updateProduct(+id, dto);
+  }
+
+  @Get() // ✅ This is the missing route!
+  async findAll(): Promise<Product[]> {
+    return this.productService.findAll();
   }
 }

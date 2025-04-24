@@ -86,6 +86,8 @@ export class OrderItemsService {
     });
   }
 
+  
+
   async findOne(id: number) {
     const orderItem = await this.orderItemsModel.findByPk(id, {
       include: [Order, Product, Customer],

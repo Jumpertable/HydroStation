@@ -17,7 +17,7 @@ async function bootstrap() {
   await sequelize.sync({ alter: true });
 
   app.enableCors({
-    origin: 'http://localhost:3100',
+    origin: 'http://localhost:3000',
     credentials: true,
   });
 

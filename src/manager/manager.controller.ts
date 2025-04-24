@@ -34,7 +34,7 @@ export class ManagerController {
     return this.managerService.updateEmployee(+id, dto);
   }
 
-  @Get(':id/employees')
+  @Get('employees/:id')
   async getEmployeesUnderManager(@Param('id') id: string) {
     return this.managerService.getEmployeesUnderManager(+id);
   }
@@ -42,6 +42,7 @@ export class ManagerController {
   @Delete('remove-employee/:id')
   removeEmployee(@Param('id') id: string) {
     return this.managerService.removeEmployee(+id);
+
   }
 
   //product
@@ -61,6 +62,11 @@ export class ManagerController {
   @Delete('remove-product/:id')
   removeProduct(@Param('id') id: number) {
     return this.managerService.removeProduct(+id);
+  }
+
+  @Get('product')
+  getAllProducts() {
+    return this.managerService.getAllProducts();
   }
 
   //order

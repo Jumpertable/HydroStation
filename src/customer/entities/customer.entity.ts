@@ -18,7 +18,7 @@ export class Customer extends Model {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  cusID: number;
+  declare cusID: number;
 
   @Column({
     type: DataType.STRING(50),
@@ -41,5 +41,10 @@ export class Customer extends Model {
     type: DataType.STRING(255),
   })
   cusAddr: string;
-  static cusName: unknown;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare password: string;
 }

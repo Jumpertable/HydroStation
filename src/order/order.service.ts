@@ -6,6 +6,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Customer } from 'src/customer/entities/customer.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class OrderService {
@@ -90,6 +91,22 @@ export class OrderService {
         ...plain,
         paymentStatus: plain.payment ? 'Paid' : 'Unpaid',
       };
+    });
+  }
+
+  async findActiveByCustomer(cusID: number) {
+    return this.orderModel.findOne({
+      where: { cusID, orderTotal: null }, // unpaid order
+    });
+  }
+
+  async findCompletedByCustomer(cusID: number) {
+    return this.orderModel.findAll({
+      where: {
+        cusID,
+        orderTotal: { [Op.not]: null },
+      },
+      order: [['createdAt', 'DESC']],
     });
   }
 

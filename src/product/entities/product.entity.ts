@@ -57,11 +57,14 @@ export class Product extends Model<Product> {
     type: DataType.STRING,
     allowNull: true,
   })
-  productDes: string;
+  declare productDes: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   declare productBrand: string;
+
+  @Column
+  declare image_url: string;
 }

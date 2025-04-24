@@ -23,4 +23,7 @@ export class UpdateProductDto {
   @IsNumber({}, { message: 'Product stock must be a number' })
   @IsOptional()
   stockLimit?: number;
+
+  @IsString()
+  image_url: string;
 }

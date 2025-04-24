@@ -9,7 +9,7 @@ export class ProductService {
     private readonly productModel: typeof Product,
   ) {}
 
-  async findAll(): Promise<Product[]> {
+  async getAllProducts(): Promise<Product[]> {
     return this.productModel.findAll();
   }
 
@@ -110,5 +110,8 @@ export class ProductService {
         stockLimit: product.stockLimit,
       },
     };
+  }
+  async findAll(): Promise<Product[]> {
+    return this.productModel.findAll();
   }
 }

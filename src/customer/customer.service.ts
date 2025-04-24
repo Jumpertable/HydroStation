@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Customer } from './entities/customer.entity';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { RegisterCustomerDto } from './dto/Register-customer.dto';
 import { Order } from 'src/order/entities/order.entity';
+import * as bcrypt from 'bcrypt';
+import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -42,7 +48,7 @@ export class CustomerService {
 
   async update(
     cusID: number,
-    updateData: UpdateCustomerDto,
+    updateData: RegisterCustomerDto,
   ): Promise<Customer> {
     console.log(`Looking for customer with ID: ${cusID}`);
 
@@ -67,5 +73,33 @@ export class CustomerService {
     if (affectedRows === 0) {
       throw new Error(`Customer with ID ${id} not found`);
     }
+  }
+
+  async register(dto: RegisterCustomerDto) {
+    const hashedPassword = await bcrypt.hash(dto.password as string, 10);
+    return this.customerModel.create({
+      cusName: dto.cusName,
+      cusEmail: dto.cusEmail,
+      password: hashedPassword,
+    });
+  }
+
+  async login(dto: LoginCustomerDto) {
+    const customer = await this.customerModel.findOne({
+      where: { cusEmail: dto.cusEmail },
+    });
+
+    console.log('👉 DTO password:', dto.password);
+    console.log('🔐 Stored hash:', customer?.password); // Use optional chaining in case customer is null
+
+    if (!customer || !(await bcrypt.compare(dto.password, customer.password))) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return {
+      message: 'Login successful',
+      cusID: customer.cusID,
+      cusName: customer.cusName,
+    };
   }
 }

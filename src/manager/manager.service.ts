@@ -109,7 +109,7 @@ export class ManagerService {
     console.log('Check for employees under manager ID:', manager_id);
     const employees = await this.employeeModel.findAll({
       where: { manager_id },
-      attributes: { exclude: ['password', 'manager_code'] },
+      attributes: { exclude: ['password'] },
     });
     console.log('🧾 Found employees:', employees);
     return employees;
@@ -129,18 +129,26 @@ export class ManagerService {
 
   //products
 
+  async getAllProducts(): Promise<Product[]> {
+    return this.productModel.findAll();
+  }
+
   async addProduct(dto: CreateProductDto) {
     return await this.productModel.create(dto as any);
   }
 
   async updateProduct(id: number, dto: UpdateProductDto) {
+    if (!id || isNaN(id)) {
+      throw new BadRequestException('Invalid product ID');
+    }
+
     const product = await this.productModel.findByPk(id);
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
     await product.update(dto);
-
     await product.reload();
 
     const stockStatus =

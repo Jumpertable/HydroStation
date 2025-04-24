@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { Customer } from './entities/customer.entity';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { RegisterCustomerDto } from './dto/Register-customer.dto';
+import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Controller('customer')
 export class CustomerController {
@@ -38,7 +39,7 @@ export class CustomerController {
   @Put('/update/:cusID') //localhost:3100/customer/update/:cusID
   async update(
     @Param('cusID', ParseIntPipe) cusID: number,
-    @Body() updateData: UpdateCustomerDto,
+    @Body() updateData: RegisterCustomerDto,
   ) {
     return await this.customerService.update(cusID, updateData);
   }
@@ -49,5 +50,15 @@ export class CustomerController {
     const destroyCus = await this.customerService.remove(+id);
     console.log(destroyCus);
     return { message: `Customer with id ${id} has been removed` };
+  }
+
+  @Post('register')
+  register(@Body() dto: RegisterCustomerDto) {
+    return this.customerService.register(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: LoginCustomerDto) {
+    return this.customerService.login(dto);
   }
 }
