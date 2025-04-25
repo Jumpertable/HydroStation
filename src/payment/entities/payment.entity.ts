@@ -32,7 +32,7 @@ export class Payment extends Model<Payment> {
   payStatus: string;
 
   @HasMany(() => Order, {
-    onDelete: 'SET NULL', // prevents constraint error when deleting orders
+    onDelete: 'SET NULL',
     foreignKey: 'payID',
   })
   orders: Order[];

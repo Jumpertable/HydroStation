@@ -104,7 +104,7 @@ export class OrderService {
     return this.orderModel.findAll({
       where: {
         cusID,
-        orderTotal: { [Op.not]: null },
+        orderTotal: { [Op.not]: null }, 
       },
       order: [['createdAt', 'DESC']],
     });

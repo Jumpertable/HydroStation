@@ -34,7 +34,7 @@ export class OrderController {
     const order = await this.orderService.findActiveByCustomer(cusID);
 
     if (!order) {
-      return res.status(204).send(); // ✅ Prevents frontend crash on empty body
+      return res.status(204).send();
     }
 
     return res.status(200).json(order);

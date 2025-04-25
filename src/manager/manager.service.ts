@@ -1,14 +1,12 @@
 import {
   Injectable,
   BadRequestException,
-  UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Manager } from './entities/manager.entity';
 import { genSalt, hash, compare } from 'bcrypt';
 import { ManagerRegisterDto } from './dto/register.dto';
-import { ManagerLoginDto } from './dto/login.dto';
 import { EmployeeRegisterDto } from 'src/employee/dto/register.dto';
 import { Employee } from 'src/employee/entities/employee.entity';
 import * as crypto from 'crypto';

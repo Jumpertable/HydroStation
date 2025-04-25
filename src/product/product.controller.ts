@@ -29,7 +29,7 @@ export class ProductController {
     return this.productService.updateProduct(+id, dto);
   }
 
-  @Get() // ✅ This is the missing route!
+  @Get()
   async findAll(): Promise<Product[]> {
     return this.productService.findAll();
   }
