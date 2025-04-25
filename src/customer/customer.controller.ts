@@ -51,10 +51,14 @@ export class CustomerController {
     console.log(destroyCus);
     return { message: `Customer with id ${id} has been removed` };
   }
-
   @Post('register')
-  register(@Body() dto: RegisterCustomerDto) {
-    return this.customerService.register(dto);
+  async register(@Body() dto: RegisterCustomerDto) {
+    const customer = await this.customerService.register(dto);
+    return {
+      message: 'Success!',
+      cusID: customer.cusID,
+      cusName: customer.cusName,
+    };
   }
 
   @Post('login')

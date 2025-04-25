@@ -1,3 +1,4 @@
+// payment.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -16,37 +17,36 @@ export class PaymentService {
     @InjectModel(Order) private orderModel: typeof Order,
   ) {}
 
-  async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
+  async create(createPaymentDto: CreatePaymentDto) {
     const { cusID, amount, payMethod, payTrans } = createPaymentDto;
 
-    // 1. Find all unpaid orders
+    console.log('🔍 Checking unpaid orders for cusID:', cusID);
+
     const unpaidOrders = await this.orderModel.findAll({
-      where: {
-        cusID,
-        payID: null,
-      },
+      where: { cusID, payID: null },
     } as any);
+
+    console.log('🧾 Unpaid orders:', unpaidOrders);
 
     if (unpaidOrders.length === 0) {
       throw new BadRequestException(
-        'No unpaid orders found for this customer.',
+        '❌ No unpaid orders found for this customer.',
       );
     }
 
-    // 2. Calculate total due
     const totalDue = unpaidOrders.reduce(
       (sum, order) => sum + (order.orderTotal || 0),
       0,
     );
 
-    // 3. Validate customer provided enough payment
+    console.log(`💰 Total due: ${totalDue}, amount provided: ${amount}`);
+
     if (amount < totalDue) {
       throw new BadRequestException(
-        `Payment amount (${amount}) does not cover total due (${totalDue}).`,
+        `❌ Payment amount (${amount}) does not cover total due (${totalDue}).`,
       );
     }
 
-    // 4. Create payment
     const payment = await this.paymentModel.create({
       cusID,
       amount,
@@ -55,20 +55,34 @@ export class PaymentService {
       payStatus: 'Paid',
     } as any);
 
-    // 5. Assign orders to payment
     for (const order of unpaidOrders) {
       order.payID = payment.payID;
       await order.save();
     }
 
-    return payment;
+    return {
+      message: '✅ Payment completed successfully!',
+      payment: {
+        payID: payment.payID,
+        cusID: payment.cusID,
+        amount: payment.amount,
+        payMethod: payment.payMethod,
+        payTrans: payment.payTrans,
+        payStatus: payment.payStatus,
+        createdAt: payment.createdAt,
+      },
+      receipt: unpaidOrders.map((order) => ({
+        orderID: order.orderID,
+        total: order.orderTotal,
+      })),
+    };
   }
 
-  async findAll(): Promise<Payment[]> {
+  async findAll() {
     return this.paymentModel.findAll({ include: [Order] });
   }
 
-  async findOne(id: number): Promise<Payment> {
+  async findOne(id: number) {
     const payment = await this.paymentModel.findByPk(id, {
       include: [Order],
     });
@@ -78,12 +92,9 @@ export class PaymentService {
     return payment;
   }
 
-  async getTotalUnpaidAmountForCustomer(cusID: number): Promise<number> {
+  async getTotalUnpaidAmountForCustomer(cusID: number) {
     const unpaidOrders = await this.orderModel.findAll({
-      where: {
-        cusID,
-        payID: null,
-      },
+      where: { cusID, payID: null },
     } as any);
 
     return unpaidOrders.reduce(

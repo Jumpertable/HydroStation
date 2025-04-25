@@ -125,4 +125,9 @@ export class OrderItemsService {
       orderItem,
     };
   }
+  async remove(id: number) {
+    return this.orderItemsModel.destroy({
+      where: { orderItemID: id },
+    });
+  }
 }

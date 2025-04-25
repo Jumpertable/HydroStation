@@ -6,6 +6,7 @@ import {
   Body,
   Patch,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { OrderItemsService } from './orderitem.service';
 import { CreateOrderItemDto } from './dto/create-orderitem.dto';
@@ -44,5 +45,11 @@ export class OrderItemsController {
     @Body() dto: UpdateOrderitemDto,
   ) {
     return this.orderItemsService.update(id, dto);
+  }
+
+  //remoooovveee
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.orderItemsService.remove(id);
   }
 }
